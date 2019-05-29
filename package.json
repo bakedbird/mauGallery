@@ -6,8 +6,5 @@
   "author": "Lefteris Psitopoulos <hello@bakedbird.com>",
   "license": "MIT",
   "private": false,
-  "repository": "https://github.com/bakedbird/mauGallery.git",
-  "dependencies": {
-    "jquery": "^3.4.0"
-  }
+  "repository": "https://github.com/bakedbird/mauGallery.git"
 }
