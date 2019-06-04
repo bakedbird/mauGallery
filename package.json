@@ -2,9 +2,9 @@
   "name": "maugallery",
   "version": "1.0.1",
   "description": "A simple images gallery built with jQuery and bootstrap 4",
-  "main": "mauGallery.js",
+  "main": "dist/maugallery.js",
   "author": "Lefteris Psitopoulos <hello@bakedbird.com>",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "repository": "https://github.com/bakedbird/mauGallery.git"
 }
