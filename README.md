@@ -1,4 +1,5 @@
 # mau Gallery
+
 A simple images gallery made with jQuery and bootstrap4
 
-TODO: add description and stuff here
+## Notice: This package will soon be deprecated in favour of a next, improved version. Use with caution
