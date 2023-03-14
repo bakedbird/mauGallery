@@ -93,10 +93,12 @@ function mauGallery(opt = {}) {
         function filterByTag(element, options) {
             function forceRedraw(galleryItemsRowId) {
                 const rootNode = document.querySelector(`#${galleryItemsRowId}`);
-                const displayStyle = rootNode.style.display;
+                const displayStyleMemo = rootNode.style.display;
+                rootNode.style.animation = 'none';
                 rootNode.style.display = 'none';
                 rootNode.offsetHeight;
-                rootNode.style.display = displayStyle;
+                rootNode.style.display = displayStyleMemo;
+                rootNode.style.animation = null;
             }
             if (element.id === options.filtersActiveTagId) {
                 return;
