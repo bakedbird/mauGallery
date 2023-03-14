@@ -91,9 +91,17 @@ function mauGallery(opt = {}) {
         }
 
         function filterByTag(element, options) {
+            function forceRedraw(galleryItemsRowId) {
+                const rootNode = document.querySelector(`#${galleryItemsRowId}`);
+                const displayStyle = rootNode.style.display;
+                rootNode.style.display = 'none';
+                rootNode.offsetHeight;
+                rootNode.style.display = displayStyle;
+            }
             if (element.id === options.filtersActiveTagId) {
                 return;
             }
+            forceRedraw(options.galleryItemsRowId);
             const galleryItems = document.querySelectorAll(`#${options.galleryRootNodeId} .${options.galleryItemClass}`);
             const activeTag = document.querySelector(`#${options.filtersActiveTagId}`);
             const tag = element.dataset.imagesToggle;
