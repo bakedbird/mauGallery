@@ -224,15 +224,15 @@ function mauGallery(opt = {}) {
       img.setAttribute('src', element.getAttribute('src'));
     }
 
-    function createLightBox(gallery, lightboxId, navigation) {
+    function createLightBox(gallery, lightboxImgId, lightboxId, navigation) {
       const lightbox = `
             <div class="modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" tabindex="-1" role="dialog" aria-hidden="true">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-body">
-                    ${navigation ? '<div class="mg-prev" style="cursor:pointer;position:absolute;top:50%;left:-15px;background:white;"><</div>' : '<span style="display:none;" />'}
-                    <img id="lightboxImage" class="img-fluid" alt="Contenu de l'image affichée dans la modale au clic"/>
-                    ${navigation ? '<div class="mg-next" style="cursor:pointer;position:absolute;top:50%;right:-15px;background:white;}">></div>' : '<span style="display:none;" />'}
+                    ${navigation ? '<div class="mg-prev" style="cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><</div>' : '<span style="display:none;" />'}
+                    <img id="${lightboxImgId}" style="user-select:none;-webkit-user-select:none;" class="img-fluid" alt="" />
+                    ${navigation ? '<div class="mg-next" style="cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}">></div>' : '<span style="display:none;" />'}
                   </div>
                 </div>
               </div>
@@ -252,7 +252,7 @@ function mauGallery(opt = {}) {
     function process(target, options) {
       createRowWrapper(target);
       if (options.lightBox) {
-        createLightBox(target, options.lightboxId, options.navigation);
+        createLightBox(target, options.lightboxImgId, options.lightboxId, options.navigation);
       }
 
       target.querySelectorAll(`.${options.galleryItemClass}`).forEach(
