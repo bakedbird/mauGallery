@@ -121,9 +121,9 @@ function mauGallery(opt = {}) {
 
       galleryItems.forEach(item => {
         if (tag === 'all' || item.dataset.galleryTag === tag) {
-          item.parentNode.style.display = 'block';
+          item.parentNode.parentNode.style.display = 'block';
         } else {
-          item.parentNode.style.display = 'none';
+          item.parentNode.parentNode.style.display = 'none';
         }
       });
     }
@@ -151,19 +151,24 @@ function mauGallery(opt = {}) {
 
     function wrapItemInColumn(element, options) {
       function doWrap(element, wrapperOpen, wrapperClose, options) {
-        if (options.lightBox && element.tagName === 'IMG') {
-          element.setAttribute('data-bs-toggle', 'modal');
-          element.setAttribute('data-bs-target', `#${options.lightboxId}`);
-        }
         orgHtml = element.outerHTML;
         newHtml = wrapperOpen + orgHtml + wrapperClose;
         element.outerHTML = newHtml;
       }
 
       const columns = options.columns;
+      const isImg = element.tagName === 'IMG';
+      const injectModalTrigger = isImg ? `data-bs-toggle="modal" data-bs-target="#${options.lightboxId}"` : ''; 
+      let wrapperOpen = '';
+      let wrapperClose = '';
       if (typeof columns === 'number') {
-        const wrapperOpen = `<div class='item-column mb-4 col-${Math.ceil(12 / columns)}'>`;
-        const wrapperClose = '</div>';
+        if (isImg) {
+          wrapperOpen = `<div class='item-column mb-4 col-${Math.ceil(12 / columns)}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
+          wrapperClose = '</a></div>';
+        } else {
+          wrapperOpen = `<div tabindex="0" class='item-column mb-4 col-${Math.ceil(12 / columns)}'><div style="width:100%;height:100%;">`;
+          wrapperClose = '</div></div>';
+        }
         doWrap(element, wrapperOpen, wrapperClose, options);
       } else if (typeof columns === 'object') {
         let columnClasses = '';
@@ -182,8 +187,13 @@ function mauGallery(opt = {}) {
         if (columns.xl) {
           columnClasses += ` col-xl-${Math.ceil(12 / columns.xl)}`;
         }
-        const wrapperOpen = `<div class='item-column mb-4${columnClasses}'>`;
-        const wrapperClose = '</div>';
+        if (isImg) {
+          wrapperOpen = `<div class='item-column mb-4${columnClasses}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
+          wrapperClose = '</a></div>';
+        } else {
+          wrapperOpen = `<div tabindex="0" class='item-column mb-4${columnClasses}'><div style="width:100%;height:100%;">`;
+          wrapperClose = '</div></div>';
+        }
         doWrap(element, wrapperOpen, wrapperClose, options);
       } else {
         console.error(`Columns should be defined as numbers or objects. ${typeof columns} is not supported.`);
@@ -207,7 +217,7 @@ function mauGallery(opt = {}) {
 
     function generateListeners(gallery, options) {
       elements = gallery.querySelectorAll(`.${options.galleryItemClass}`);
-      elements.forEach(element => element.addEventListener('click', () => {
+      elements.forEach(element => element.parentNode.addEventListener('click', () => {
         if (options.lightBox && element.tagName === 'IMG') {
           lightBoxOnOpen(element, options.lightboxId, options.lightboxImgId);
         }
