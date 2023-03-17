@@ -218,6 +218,27 @@ function mauGallery(opt = {}) {
       });
       galleryElementMgPrev.addEventListener('click', () => prevImage(options.filtersActiveTagId, options.lightboxImgId, options.galleryItemClass));
       galleryElementMgNext.addEventListener('click', () => nextImage(options.filtersActiveTagId, options.lightboxImgId, options.galleryItemClass));
+
+      const modal = document.querySelector(`#${options.lightboxId}`);
+      modal.addEventListener('shown.bs.modal', () => {
+        if (options.navigation) {
+          const buttons = modal.querySelectorAll('button');
+          let index = 1;
+          for (const button of buttons) {
+            button.setAttribute('tabindex', index);
+            index += 1;
+          }
+        }
+      });
+
+      modal.addEventListener('hidden.bs.modal', () => {
+        if (options.navigation) {
+          const buttons = modal.querySelectorAll('button');
+          for (const button of buttons) {
+            button.removeAttribute('tabindex');
+          }
+        }
+      });
     }
 
     function lightBoxOnOpen(element, lightboxId, lightboxImgId) {
@@ -239,8 +260,8 @@ function mauGallery(opt = {}) {
             <div class="modal-content">
               <div class="modal-body">
                 <img id="${lightboxImgId}" style="user-select:none;-webkit-user-select:none;" class="img-fluid" alt="" />
-                ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="mg-prev" tabindex="1" style="border:none;cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><span><</span></button>` : '<span style="display:none;" />'}
-                ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="mg-next" tabindex="2" style="border:none;cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}"><span>></span></button>` : '<span style="display:none;" />'}
+                ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="mg-prev" style="border:none;cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><span><</span></button>` : '<span style="display:none;" />'}
+                ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="mg-next" style="border:none;cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}"><span>></span></button>` : '<span style="display:none;" />'}
               </div>
             </div>
           </div>
