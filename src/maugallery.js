@@ -152,6 +152,23 @@ function mauGallery(opt = {}) {
     }
 
     function wrapItemInColumn(element, options) {
+      const style = (() => {
+        let style = document.createElement('style');
+        style.appendChild(document.createTextNode(''));
+        document.head.appendChild(style);
+        return style;
+      })();
+
+      function isOnMobile() {
+        return (navigator.userAgent.match(/Android/i)
+          || navigator.userAgent.match(/webOS/i)
+          || navigator.userAgent.match(/iPhone/i)
+          || navigator.userAgent.match(/iPad/i)
+          || navigator.userAgent.match(/iPod/i)
+          || navigator.userAgent.match(/BlackBerry/i)
+          || navigator.userAgent.match(/Windows Phone/i));
+      }
+
       function doWrap(element, wrapperOpen, wrapperClose, options) {
         orgHtml = element.outerHTML;
         newHtml = wrapperOpen + orgHtml + wrapperClose;
@@ -160,9 +177,12 @@ function mauGallery(opt = {}) {
 
       const columns = options.columns;
       const isImg = element.tagName === 'IMG';
-      const injectModalTrigger = isImg ? `data-bs-toggle="modal" data-bs-target="#${options.lightboxId}"` : ''; 
+      const injectModalTrigger = isImg ? `data-bs-toggle="modal" data-bs-target="#${options.lightboxId}"` : '';
       let wrapperOpen = '';
       let wrapperClose = '';
+      if (isOnMobile()) {
+        style.sheet.insertRule(`#${options.galleryRootNodeId} .item-column a:focus { outline: none !important; }`, 0);
+      }
       if (typeof columns === 'number') {
         if (isImg) {
           wrapperOpen = `<div class='item-column mb-4 col-${Math.ceil(12 / columns)}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
@@ -219,10 +239,10 @@ function mauGallery(opt = {}) {
 
     function generateListeners(gallery, options) {
       function handleKeyDown(event) {
-        if (event.keyCode == 37 || event.key === "ArrowLeft") {
+        if (event.keyCode == 37 || event.key === 'ArrowLeft') {
           prevImage(options.filtersActiveTagId, options.lightboxImgId, options.galleryItemClass);
         }
-        if (event.keyCode == 39 || event.key === "ArrowRight") {
+        if (event.keyCode == 39 || event.key === 'ArrowRight') {
           nextImage(options.filtersActiveTagId, options.lightboxImgId, options.galleryItemClass);
         }
       }
@@ -295,7 +315,7 @@ function mauGallery(opt = {}) {
       const navigation = options.navigation;
       const prevImgBtnLabel = options.prevImgButtonLabel;
       const nextImgBtnLabel = options.nextImgButtonLabel;
-  
+
       const lightbox = `
         <div class="modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" tabindex="-1" role="dialog" aria-hidden="true">
           <div class="modal-dialog" role="document">
