@@ -10,7 +10,9 @@ function mauGallery(opt = {}) {
     galleryItemClass: 'gallery-item',
     showTags: true,
     tagsPosition: 'bottom',
-    navigation: true
+    navigation: true,
+    prevImgButtonLabel: 'Previous image',
+    nextImgButtonLabel: 'Next image'
   };
   const tagsSet = new Set();
 
@@ -224,19 +226,25 @@ function mauGallery(opt = {}) {
       img.setAttribute('src', element.getAttribute('src'));
     }
 
-    function createLightBox(gallery, lightboxImgId, lightboxId, navigation) {
+    function createLightBox(gallery, options) {
+      const lightboxImgId = options.lightboxImgId;
+      const lightboxId = options.lightboxId;
+      const navigation = options.navigation;
+      const prevImgBtnLabel = options.prevImgButtonLabel;
+      const nextImgBtnLabel = options.nextImgButtonLabel;
+  
       const lightbox = `
-            <div class="modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" tabindex="-1" role="dialog" aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-body">
-                    ${navigation ? '<div class="mg-prev" tabindex="1" style="cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><</div>' : '<span style="display:none;" />'}
-                    <img id="${lightboxImgId}" style="user-select:none;-webkit-user-select:none;" class="img-fluid" alt="" />
-                    ${navigation ? '<div class="mg-next" tabindex="2" style="cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}">></div>' : '<span style="display:none;" />'}
-                  </div>
-                </div>
+        <div class="modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                <img id="${lightboxImgId}" style="user-select:none;-webkit-user-select:none;" class="img-fluid" alt="" />
+                ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="mg-prev" tabindex="1" style="border:none;cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><span><</span></button>` : '<span style="display:none;" />'}
+                ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="mg-next" tabindex="2" style="border:none;cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}"><span>></span></button>` : '<span style="display:none;" />'}
               </div>
-            </div>`;
+            </div>
+          </div>
+        </div>`;
       gallery.innerHTML = gallery.innerHTML + lightbox;
     }
 
@@ -252,7 +260,7 @@ function mauGallery(opt = {}) {
     function process(target, options) {
       createRowWrapper(target);
       if (options.lightBox) {
-        createLightBox(target, options.lightboxImgId, options.lightboxId, options.navigation);
+        createLightBox(target, options);
       }
 
       target.querySelectorAll(`.${options.galleryItemClass}`).forEach(
