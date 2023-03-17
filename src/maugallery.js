@@ -230,9 +230,9 @@ function mauGallery(opt = {}) {
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-body">
-                    ${navigation ? '<div class="mg-prev" style="cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><</div>' : '<span style="display:none;" />'}
+                    ${navigation ? '<div class="mg-prev" tabindex="1" style="cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><</div>' : '<span style="display:none;" />'}
                     <img id="${lightboxImgId}" style="user-select:none;-webkit-user-select:none;" class="img-fluid" alt="" />
-                    ${navigation ? '<div class="mg-next" style="cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}">></div>' : '<span style="display:none;" />'}
+                    ${navigation ? '<div class="mg-next" tabindex="2" style="cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}">></div>' : '<span style="display:none;" />'}
                   </div>
                 </div>
               </div>
