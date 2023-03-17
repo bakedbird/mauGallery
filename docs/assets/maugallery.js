@@ -216,6 +216,14 @@ function mauGallery(opt = {}) {
     }
 
     function generateListeners(gallery, options) {
+      function handleKeyDown(event) {
+        if (event.keyCode == 37 || event.key === "ArrowLeft") {
+          prevImage(options.filtersActiveTagId, options.lightboxImgId, options.galleryItemClass);
+        }
+        if (event.keyCode == 39 || event.key === "ArrowRight") {
+          nextImage(options.filtersActiveTagId, options.lightboxImgId, options.galleryItemClass);
+        }
+      }
       elements = gallery.querySelectorAll(`.${options.galleryItemClass}`);
       elements.forEach(element => element.parentNode.addEventListener('click', () => {
         if (options.lightBox && element.tagName === 'IMG') {
@@ -243,6 +251,7 @@ function mauGallery(opt = {}) {
             index += 1;
           }
         }
+        document.addEventListener('keydown', handleKeyDown);
       });
 
       modal.addEventListener('hidden.bs.modal', () => {
@@ -252,6 +261,7 @@ function mauGallery(opt = {}) {
             button.removeAttribute('tabindex');
           }
         }
+        document.removeEventListener('keydown', handleKeyDown);
       });
     }
 
