@@ -18,6 +18,7 @@ function mauGallery(opt = {}) {
   };
   let memoCurX = 0;
   let memoCurY = 0;
+  let memoScrollBehavior = '';
   const tagsSet = new Set();
 
   function injectMau(target, options) {
@@ -105,24 +106,22 @@ function mauGallery(opt = {}) {
     }
 
     function filterByTag(element, options) {
-      function forceRedraw(options) {
+      function forceReplayAnim(options) {
         const galleryItemsRowId = options.galleryItemsRowId;
         const mauPrefixClass = options.mauPrefixClass;
         const rootNode = document.querySelector(`.${mauPrefixClass}#${galleryItemsRowId}`);
-        rootNode.style.animation = 'none';
-        rootNode.style.display = 'none';
-        rootNode.offsetHeight;
-        rootNode.style.display = null;
-        rootNode.style.animation = null;
         rootNode.style.animationName = 'none';
-        requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
           rootNode.style.animationName = null;
         });
       }
+
       if (element.id === options.filtersActiveTagId) {
         return;
       }
-      forceRedraw(options);
+
+      saveCurrentCameraPosition();
+      forceReplayAnim(options);
       const galleryItems = document.querySelectorAll(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.${options.galleryItemClass}`);
       const activeTag = document.querySelector(`.${options.mauPrefixClass}#${options.filtersActiveTagId}`);
       const tag = element.dataset.imagesToggle;
@@ -138,6 +137,7 @@ function mauGallery(opt = {}) {
         } else {
           item.parentNode.parentNode.style.display = 'none';
         }
+        snapCameraToSavedPosition(delay = 3);
       });
     }
 
@@ -146,10 +146,10 @@ function mauGallery(opt = {}) {
       const activeTagId = options.filtersActiveTagId;
       const disableFiltersButtonLabel = options.disableFiltersButtonLabel;
       let tagItems =
-        `<li class="nav-item"><button class="${options.mauPrefixClass} nav-link active" data-images-toggle="all" id="${activeTagId}">${disableFiltersButtonLabel}</button></li>`;
+        `<li class="nav-item"><button style="touch-action:manipulation;" class="${options.mauPrefixClass} nav-link active" data-images-toggle="all" id="${activeTagId}">${disableFiltersButtonLabel}</button></li>`;
       tagsSet.forEach(value => {
         tagItems += `<li class="nav-item">
-                <button class="${options.mauPrefixClass} nav-link" data-images-toggle="${value}">${value}</button></li>`;
+                <button style="touch-action:manipulation;" class="${options.mauPrefixClass} nav-link" data-images-toggle="${value}">${value}</button></li>`;
       });
 
       const tagsRow = `<ul class="my-4 tags-bar nav nav-pills">${tagItems}</ul>`;
@@ -249,6 +249,35 @@ function mauGallery(opt = {}) {
       }
     }
 
+    function saveCurrentCameraPosition() {
+      memoScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'smooth !important;'
+      memoCurX = window.scrollX;
+      memoCurY = window.scrollY;
+    }
+
+    function clearSaveCurrentCameraPositionSideEffects() {
+      document.documentElement.style.scrollBehavior = memoScrollBehavior;
+    }
+
+    function snapCamera(x, y, delay = 0) {
+      setTimeout(() => {
+        const oldScrollBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = 'auto !important;'
+        window.scrollTo({
+          top: y,
+          left: x,
+          behavior: 'auto'
+        });
+        document.documentElement.style.scrollBehavior = oldScrollBehavior;
+      }, delay);
+    }
+
+    function snapCameraToSavedPosition(delay = 2) {
+      snapCamera(memoCurX, memoCurY, delay);
+      clearSaveCurrentCameraPositionSideEffects();
+    }
+
     function generateListeners(gallery, modal, options) {
       function handleKeyDown(event) {
         if (event.keyCode == 37 || event.key === 'ArrowLeft') {
@@ -266,19 +295,20 @@ function mauGallery(opt = {}) {
         }
       }));
 
-      const galleryElementNavLinks = gallery.querySelectorAll('.nav-link');
+      const galleryElementNavLinks = gallery.querySelectorAll(`.${options.mauPrefixClass}.nav-link`);
       const galleryElementMgPrev = gallery.querySelector(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.mg-prev`);
       const galleryElementMgNext = gallery.querySelector(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.mg-next`);
 
       galleryElementNavLinks.forEach(navlink => {
-        navlink.addEventListener('click', (event) => filterByTag(event.target, options));
+        navlink.addEventListener('click', (event) => {
+          filterByTag(event.target, options);
+        });
       });
       galleryElementMgPrev.addEventListener('click', () => prevImage(options));
       galleryElementMgNext.addEventListener('click', () => nextImage(options));
 
       modal.addEventListener('shown.bs.modal', () => {
-        memoCurX = window.scrollX;
-        memoCurY = window.scrollY;
+        saveCurrentCameraPosition();
         document.addEventListener('keydown', handleKeyDown);
       });
 
@@ -289,17 +319,8 @@ function mauGallery(opt = {}) {
             button.removeAttribute('tabindex');
           }
         }
+        snapCameraToSavedPosition();
         document.removeEventListener('keydown', handleKeyDown);
-        setTimeout(() => {
-          const oldScrollBehavior = document.documentElement.style.scrollBehavior;
-          document.documentElement.style.scrollBehavior = 'auto !important;'
-          window.scrollTo({
-            top: memoCurY,
-            left: memoCurX,
-            behavior: 'auto'
-          });
-          document.documentElement.style.scrollBehavior = oldScrollBehavior;
-        }, 1);
       });
     }
 
