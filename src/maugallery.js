@@ -19,9 +19,23 @@ function mauGallery(opt = {}) {
   let memoCurX = 0;
   let memoCurY = 0;
   let memoScrollBehavior = null;
+  let memoIsOnMobile = null;
   const tagsSet = new Set();
 
   function injectMau(target, options) {
+    function isOnMobile() {
+      if (memoIsOnMobile === null) {
+        memoIsOnMobile = (navigator.userAgent.match(/Android/i)
+        || navigator.userAgent.match(/webOS/i)
+        || navigator.userAgent.match(/iPhone/i)
+        || navigator.userAgent.match(/iPad/i)
+        || navigator.userAgent.match(/iPod/i)
+        || navigator.userAgent.match(/BlackBerry/i)
+        || navigator.userAgent.match(/Windows Phone/i));
+      }
+      return memoIsOnMobile;
+    }
+
     function saveCurrentCameraPosition() {
       memoScrollBehavior = document.documentElement.style.scrollBehavior;
       document.documentElement.style.scrollBehavior = 'smooth !important;'
@@ -58,16 +72,6 @@ function mauGallery(opt = {}) {
         document.head.appendChild(style);
         return style;
       })();
-
-      function isOnMobile() {
-        return (navigator.userAgent.match(/Android/i)
-          || navigator.userAgent.match(/webOS/i)
-          || navigator.userAgent.match(/iPhone/i)
-          || navigator.userAgent.match(/iPad/i)
-          || navigator.userAgent.match(/iPod/i)
-          || navigator.userAgent.match(/BlackBerry/i)
-          || navigator.userAgent.match(/Windows Phone/i));
-      }
 
       function doWrap(element, wrapperOpen, wrapperClose, options) {
         orgHtml = element.outerHTML;
@@ -211,6 +215,13 @@ function mauGallery(opt = {}) {
         const galleryItemsRowId = options.galleryItemsRowId;
         const mauPrefixClass = options.mauPrefixClass;
         const rootNode = document.querySelector(`.${mauPrefixClass}#${galleryItemsRowId}`);
+        if (!isOnMobile()) {
+          rootNode.style.animation = 'none';
+          rootNode.style.display = 'none';
+          rootNode.offsetHeight;
+          rootNode.style.display = null;
+          rootNode.style.animation = null;
+        }
         rootNode.style.animationName = 'none';
         window.requestAnimationFrame(() => rootNode.style.animationName = null);
       }
