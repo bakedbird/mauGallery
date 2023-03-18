@@ -324,13 +324,13 @@ function mauGallery(opt = {}) {
       const mauPrefixClass = options.mauPrefixClass;
 
       const lightbox = `
-        <div class="modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" tabindex="-1" role="dialog" aria-hidden="true" style="user-select:none;-webkit-user-select:none;">
           <div class="${mauPrefixClass} modal-dialog" role="document">
             <div class="${mauPrefixClass} modal-content">
               <div class="${mauPrefixClass} modal-body">
                 <img id="${lightboxImgId}" style="user-select:none;-webkit-user-select:none;" class="img-fluid" alt="" />
-                ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="${mauPrefixClass} mg-prev" style="touch-action:manipulation;border:none;cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><span><</span></button>` : '<span style="display:none;" />'}
-                ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="${mauPrefixClass} mg-next" style="touch-action:manipulation;border:none;cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}"><span>></span></button>` : '<span style="display:none;" />'}
+                ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="${mauPrefixClass} mg-prev" style="touch-action:manipulation;border:none;cursor:pointer;position:absolute;top:50%;left:-15px;background:white;"><span><</span></button>` : '<span style="display:none;" />'}
+                ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="${mauPrefixClass} mg-next" style="touch-action:manipulation;border:none;cursor:pointer;position:absolute;top:50%;right:-15px;background:white;}"><span>></span></button>` : '<span style="display:none;" />'}
               </div>
             </div>
           </div>
