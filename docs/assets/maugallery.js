@@ -185,19 +185,20 @@ function mauGallery(opt = {}) {
       }
 
       const columns = options.columns;
+      const mauPrefixClass = options.mauPrefixClass;
       const isImg = element.tagName === 'IMG';
       const injectModalTrigger = isImg ? `data-bs-toggle="modal" data-bs-target="#${options.lightboxId}"` : '';
       let wrapperOpen = '';
       let wrapperClose = '';
       if (isOnMobile()) {
-        style.sheet.insertRule(`#${options.galleryRootNodeId} .item-column a:focus { outline: none !important; }`, 0);
+        style.sheet.insertRule(`#${options.galleryRootNodeId} ${mauPrefixClass}.item-column a:focus { outline: none !important; }`, 0);
       }
       if (typeof columns === 'number') {
         if (isImg) {
-          wrapperOpen = `<div class='item-column mb-4 col-${Math.ceil(12 / columns)}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
+          wrapperOpen = `<div class='${mauPrefixClass} item-column mb-4 col-${Math.ceil(12 / columns)}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
           wrapperClose = '</a></div>';
         } else {
-          wrapperOpen = `<div tabindex="0" class='item-column mb-4 col-${Math.ceil(12 / columns)}'><div style="width:100%;height:100%;">`;
+          wrapperOpen = `<div tabindex="0" class='${mauPrefixClass} item-column mb-4 col-${Math.ceil(12 / columns)}'><div style="width:100%;height:100%;">`;
           wrapperClose = '</div></div>';
         }
         doWrap(element, wrapperOpen, wrapperClose, options);
@@ -219,10 +220,10 @@ function mauGallery(opt = {}) {
           columnClasses += ` col-xl-${Math.ceil(12 / columns.xl)}`;
         }
         if (isImg) {
-          wrapperOpen = `<div class='item-column mb-4${columnClasses}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
+          wrapperOpen = `<div class='${mauPrefixClass} item-column mb-4${columnClasses}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
           wrapperClose = '</a></div>';
         } else {
-          wrapperOpen = `<div tabindex="0" class='item-column mb-4${columnClasses}'><div style="width:100%;height:100%;">`;
+          wrapperOpen = `<div tabindex="0" class='${mauPrefixClass} item-column mb-4${columnClasses}'><div style="width:100%;height:100%;">`;
           wrapperClose = '</div></div>';
         }
         doWrap(element, wrapperOpen, wrapperClose, options);
