@@ -216,14 +216,17 @@ function mauGallery(opt = {}) {
         const mauPrefixClass = options.mauPrefixClass;
         const rootNode = document.querySelector(`.${mauPrefixClass}#${galleryItemsRowId}`);
         if (!isOnMobile()) {
+          const oldAnimation = rootNode.style.animation;
+          const oldDisplay = rootNode.style.display;
           rootNode.style.animation = 'none';
           rootNode.style.display = 'none';
           rootNode.offsetHeight;
-          rootNode.style.display = null;
-          rootNode.style.animation = null;
+          rootNode.style.display = oldDisplay;
+          rootNode.style.animation = oldAnimation;
         }
+        const oldAnimationName = rootNode.style.animationName;
         rootNode.style.animationName = 'none';
-        window.requestAnimationFrame(() => rootNode.style.animationName = null);
+        window.requestAnimationFrame(() => rootNode.style.animationName = oldAnimationName);
       }
 
       if (element.id === options.filtersActiveTagId) {
