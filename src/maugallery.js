@@ -332,8 +332,8 @@ function mauGallery(opt = {}) {
             <div class="${mauPrefixClass} modal-content">
               <div class="${mauPrefixClass} modal-body">
                 <img id="${lightboxImgId}" style="user-select:none;-webkit-user-select:none;" class="img-fluid" alt="" />
-                ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="${mauPrefixClass} mg-prev" style="border:none;cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><span><</span></button>` : '<span style="display:none;" />'}
-                ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="${mauPrefixClass} mg-next" style="border:none;cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}"><span>></span></button>` : '<span style="display:none;" />'}
+                ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="${mauPrefixClass} mg-prev" style="touch-action:manipulation;border:none;cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><span><</span></button>` : '<span style="display:none;" />'}
+                ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="${mauPrefixClass} mg-next" style="touch-action:manipulation;border:none;cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}"><span>></span></button>` : '<span style="display:none;" />'}
               </div>
             </div>
           </div>
