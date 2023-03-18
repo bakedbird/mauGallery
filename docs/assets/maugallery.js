@@ -8,6 +8,7 @@ function mauGallery(opt = {}) {
     filtersActiveTagId: 'active-tag',
     lightboxImgId: 'lightboxImage',
     galleryItemClass: 'gallery-item',
+    mauPrefixClass: 'mau',
     showTags: true,
     tagsPosition: 'bottom',
     navigation: true,
@@ -20,12 +21,16 @@ function mauGallery(opt = {}) {
   const tagsSet = new Set();
 
   function injectMau(target, options) {
-    function prevImage(filtersActiveTagId, lightboxImgId, galleryItemClass) {
-      let activeImage = null;
-      let imagesCollection = [];
-      const galleryItems = document.querySelectorAll(`img.${galleryItemClass}`);
+    function prevImage(options) {
+      const filtersActiveTagId = options.filtersActiveTagId;
+      const lightboxImgId = options.lightboxImgId;
+      const galleryItemClass = options.galleryItemClass;
+      const mauPrefixClass = options.mauPrefixClass;
+      const galleryItems = document.querySelectorAll(`img.${mauPrefixClass}.${galleryItemClass}`);
       const lightboxImgSrc = document.querySelector(`#${lightboxImgId}`).getAttribute('src');
       const activeTag = document.querySelector(`#${filtersActiveTagId}`).dataset.imagesToggle;
+      let activeImage = null;
+      let imagesCollection = [];
 
       for (const item of galleryItems) {
         if (item.getAttribute('src') === lightboxImgSrc) {
@@ -59,12 +64,16 @@ function mauGallery(opt = {}) {
       document.querySelector(`#${lightboxImgId}`).setAttribute('src', prev.getAttribute('src'));
     }
 
-    function nextImage(filtersActiveTagId, lightboxImgId, galleryItemClass) {
-      let activeImage = null;
-      let imagesCollection = [];
-      const galleryItems = document.querySelectorAll(`img.${galleryItemClass}`);
+    function nextImage(options) {
+      const filtersActiveTagId = options.filtersActiveTagId;
+      const lightboxImgId = options.lightboxImgId;
+      const galleryItemClass = options.galleryItemClass;
+      const mauPrefixClass = options.mauPrefixClass;
+      const galleryItems = document.querySelectorAll(`img.${mauPrefixClass}.${galleryItemClass}`);
       const lightboxImgSrc = document.querySelector(`#${lightboxImgId}`).getAttribute('src');
       const activeTag = document.querySelector(`#${filtersActiveTagId}`).dataset.imagesToggle;
+      let activeImage = null;
+      let imagesCollection = [];
 
       for (const item of galleryItems) {
         if (item.getAttribute('src') === lightboxImgSrc) {
@@ -112,7 +121,7 @@ function mauGallery(opt = {}) {
         return;
       }
       forceRedraw(options.galleryItemsRowId);
-      const galleryItems = document.querySelectorAll(`#${options.galleryRootNodeId} .${options.galleryItemClass}`);
+      const galleryItems = document.querySelectorAll(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.${options.galleryItemClass}`);
       const activeTag = document.querySelector(`#${options.filtersActiveTagId}`);
       const tag = element.dataset.imagesToggle;
 
@@ -135,10 +144,10 @@ function mauGallery(opt = {}) {
       const activeTagId = options.filtersActiveTagId;
       const disableFiltersButtonLabel = options.disableFiltersButtonLabel;
       let tagItems =
-        `<li class="nav-item"><button class="mau nav-link active" data-images-toggle="all" id="${activeTagId}">${disableFiltersButtonLabel}</span></li>`;
+        `<li class="nav-item"><button class="${options.mauPrefixClass} nav-link active" data-images-toggle="all" id="${activeTagId}">${disableFiltersButtonLabel}</span></li>`;
       tagsSet.forEach(value => {
         tagItems += `<li class="nav-item">
-                <button class="mau nav-link" data-images-toggle="${value}">${value}</span></li>`;
+                <button class="${options.mauPrefixClass} nav-link" data-images-toggle="${value}">${value}</span></li>`;
       });
 
       const tagsRow = `<ul class="my-4 tags-bar nav nav-pills">${tagItems}</ul>`;
@@ -240,13 +249,13 @@ function mauGallery(opt = {}) {
     function generateListeners(gallery, options) {
       function handleKeyDown(event) {
         if (event.keyCode == 37 || event.key === 'ArrowLeft') {
-          prevImage(options.filtersActiveTagId, options.lightboxImgId, options.galleryItemClass);
+          prevImage(options);
         }
         if (event.keyCode == 39 || event.key === 'ArrowRight') {
-          nextImage(options.filtersActiveTagId, options.lightboxImgId, options.galleryItemClass);
+          nextImage(options);
         }
       }
-      elements = gallery.querySelectorAll(`.${options.galleryItemClass}`);
+      elements = gallery.querySelectorAll(`.${options.mauPrefixClass}.${options.galleryItemClass}`);
       elements.forEach(element => element.parentNode.addEventListener('click', (event) => {
         event.preventDefault();
         if (options.lightBox && element.tagName === 'IMG') {
@@ -255,8 +264,8 @@ function mauGallery(opt = {}) {
       }));
 
       const galleryElementNavLinks = gallery.querySelectorAll('.nav-link');
-      const galleryElementMgPrev = gallery.querySelector(`#${options.galleryRootNodeId} .mg-prev`);
-      const galleryElementMgNext = gallery.querySelector(`#${options.galleryRootNodeId} .mg-next`);
+      const galleryElementMgPrev = gallery.querySelector(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.mg-prev`);
+      const galleryElementMgNext = gallery.querySelector(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.mg-next`);
 
       galleryElementNavLinks.forEach(navlink => {
         navlink.addEventListener('click', (event) => {
@@ -264,8 +273,8 @@ function mauGallery(opt = {}) {
           filterByTag(event.target, options);
         });
       });
-      galleryElementMgPrev.addEventListener('click', () => prevImage(options.filtersActiveTagId, options.lightboxImgId, options.galleryItemClass));
-      galleryElementMgNext.addEventListener('click', () => nextImage(options.filtersActiveTagId, options.lightboxImgId, options.galleryItemClass));
+      galleryElementMgPrev.addEventListener('click', () => prevImage(options));
+      galleryElementMgNext.addEventListener('click', () => nextImage(options));
 
       const modal = document.querySelector(`#${options.lightboxId}`);
       modal.addEventListener('shown.bs.modal', () => {
@@ -315,15 +324,16 @@ function mauGallery(opt = {}) {
       const navigation = options.navigation;
       const prevImgBtnLabel = options.prevImgButtonLabel;
       const nextImgBtnLabel = options.nextImgButtonLabel;
+      const mauPrefixClass = options.mauPrefixClass;
 
       const lightbox = `
         <div class="modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" tabindex="-1" role="dialog" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-body">
+          <div class="${mauPrefixClass} modal-dialog" role="document">
+            <div class="${mauPrefixClass} modal-content">
+              <div class="${mauPrefixClass} modal-body">
                 <img id="${lightboxImgId}" style="user-select:none;-webkit-user-select:none;" class="img-fluid" alt="" />
-                ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="mg-prev" style="border:none;cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><span><</span></button>` : '<span style="display:none;" />'}
-                ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="mg-next" style="border:none;cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}"><span>></span></button>` : '<span style="display:none;" />'}
+                ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="${mauPrefixClass} mg-prev" style="border:none;cursor:pointer;position:absolute;top:50%;left:-15px;background:white;user-select:none;-webkit-user-select:none;"><span><</span></button>` : '<span style="display:none;" />'}
+                ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="${mauPrefixClass} mg-next" style="border:none;cursor:pointer;position:absolute;top:50%;right:-15px;background:white;user-select:none;-webkit-user-select:none;}"><span>></span></button>` : '<span style="display:none;" />'}
               </div>
             </div>
           </div>
@@ -346,7 +356,7 @@ function mauGallery(opt = {}) {
         createLightBox(target, options);
       }
 
-      target.querySelectorAll(`.${options.galleryItemClass}`).forEach(
+      target.querySelectorAll(`.${options.mauPrefixClass}.${options.galleryItemClass}`).forEach(
         item => generateRowWrapper(target, item, options, tagsSet)
       );
 
