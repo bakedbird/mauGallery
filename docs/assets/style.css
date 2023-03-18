@@ -35,6 +35,12 @@
   margin: 0 auto 0 auto
 }
 
+.mau#active-tag {
+  color: #fff;
+  background-color: #363066;
+  border-radius: 0
+}
+
 @media only screen and (max-width:1000px) {
   .mau.mg-next,
   .mau.mg-prev {

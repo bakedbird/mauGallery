@@ -28,7 +28,7 @@ function mauGallery(opt = {}) {
       const mauPrefixClass = options.mauPrefixClass;
       const galleryItems = document.querySelectorAll(`img.${mauPrefixClass}.${galleryItemClass}`);
       const lightboxImgSrc = document.querySelector(`#${lightboxImgId}`).getAttribute('src');
-      const activeTag = document.querySelector(`#${filtersActiveTagId}`).dataset.imagesToggle;
+      const activeTag = document.querySelector(`.${mauPrefixClass}#${filtersActiveTagId}`).dataset.imagesToggle;
       let activeImage = null;
       let imagesCollection = [];
 
@@ -71,7 +71,7 @@ function mauGallery(opt = {}) {
       const mauPrefixClass = options.mauPrefixClass;
       const galleryItems = document.querySelectorAll(`img.${mauPrefixClass}.${galleryItemClass}`);
       const lightboxImgSrc = document.querySelector(`#${lightboxImgId}`).getAttribute('src');
-      const activeTag = document.querySelector(`#${filtersActiveTagId}`).dataset.imagesToggle;
+      const activeTag = document.querySelector(`.${mauPrefixClass}#${filtersActiveTagId}`).dataset.imagesToggle;
       let activeImage = null;
       let imagesCollection = [];
 
@@ -122,12 +122,12 @@ function mauGallery(opt = {}) {
       }
       forceRedraw(options.galleryItemsRowId);
       const galleryItems = document.querySelectorAll(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.${options.galleryItemClass}`);
-      const activeTag = document.querySelector(`#${options.filtersActiveTagId}`);
+      const activeTag = document.querySelector(`.${options.mauPrefixClass}#${options.filtersActiveTagId}`);
       const tag = element.dataset.imagesToggle;
 
       activeTag.classList.remove('active');
       activeTag.removeAttribute('id');
-      element.classList.add('active');
+      element.classList.add(options.mauPrefixClass, 'active');
       element.id = options.filtersActiveTagId;
 
       galleryItems.forEach(item => {
