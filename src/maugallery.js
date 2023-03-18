@@ -2,7 +2,7 @@ function mauGallery(opt = {}) {
   const mauGallerydefaults = {
     columns: 3,
     lightBox: true,
-    lightboxId: null,
+    lightboxId: 'mauDefaultLightboxId',
     galleryRootNodeId: 'maugallery',
     galleryItemsRowId: 'gallery-items-row',
     filtersActiveTagId: 'active-tag',
@@ -27,7 +27,7 @@ function mauGallery(opt = {}) {
       const galleryItemClass = options.galleryItemClass;
       const mauPrefixClass = options.mauPrefixClass;
       const galleryItems = document.querySelectorAll(`img.${mauPrefixClass}.${galleryItemClass}`);
-      const lightboxImgSrc = document.querySelector(`#${lightboxImgId}`).getAttribute('src');
+      const lightboxImgSrc = document.querySelector(`.${mauPrefixClass}#${lightboxImgId}`).getAttribute('src');
       const activeTag = document.querySelector(`.${mauPrefixClass}#${filtersActiveTagId}`).dataset.imagesToggle;
       let activeImage = null;
       let imagesCollection = [];
@@ -70,7 +70,7 @@ function mauGallery(opt = {}) {
       const galleryItemClass = options.galleryItemClass;
       const mauPrefixClass = options.mauPrefixClass;
       const galleryItems = document.querySelectorAll(`img.${mauPrefixClass}.${galleryItemClass}`);
-      const lightboxImgSrc = document.querySelector(`#${lightboxImgId}`).getAttribute('src');
+      const lightboxImgSrc = document.querySelector(`.${mauPrefixClass}#${lightboxImgId}`).getAttribute('src');
       const activeTag = document.querySelector(`.${mauPrefixClass}#${filtersActiveTagId}`).dataset.imagesToggle;
       let activeImage = null;
       let imagesCollection = [];
@@ -101,7 +101,7 @@ function mauGallery(opt = {}) {
       }
 
       const next = imagesCollection[index] ?? imagesCollection[0];
-      document.querySelector(`#${lightboxImgId}`).setAttribute('src', next.getAttribute('src'));
+      document.querySelector(`.${mauPrefixClass}#${lightboxImgId}`).setAttribute('src', next.getAttribute('src'));
     }
 
     function filterByTag(element, options) {
@@ -187,7 +187,7 @@ function mauGallery(opt = {}) {
       const columns = options.columns;
       const mauPrefixClass = options.mauPrefixClass;
       const isImg = element.tagName === 'IMG';
-      const injectModalTrigger = isImg ? `data-bs-toggle="modal" data-bs-target="#${options.lightboxId}"` : '';
+      const injectModalTrigger = isImg ? `data-bs-toggle="modal" data-bs-target=".${options.mauPrefixClass}#${options.lightboxId}"` : '';
       let wrapperOpen = '';
       let wrapperClose = '';
       if (isOnMobile()) {
@@ -302,8 +302,8 @@ function mauGallery(opt = {}) {
     }
 
     function lightBoxOnOpen(modal, element, options) {
-      const e = document.querySelector(`#${options.lightboxId}`);
-      const img = e.querySelector(`#${options.lightboxImgId}`);
+      const e = document.querySelector(`.${options.mauPrefixClass}#${options.lightboxId}`);
+      const img = e.querySelector(`.${options.mauPrefixClass}#${options.lightboxImgId}`);
       img.setAttribute('src', element.getAttribute('src'));
       if (options.navigation) {
         const buttons = modal.querySelectorAll('button');
@@ -324,11 +324,11 @@ function mauGallery(opt = {}) {
       const mauPrefixClass = options.mauPrefixClass;
 
       const lightbox = `
-        <div class="modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" tabindex="-1" role="dialog" aria-hidden="true" style="user-select:none;-webkit-user-select:none;">
+        <div class="${mauPrefixClass} modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" tabindex="-1" role="dialog" aria-hidden="true" style="user-select:none;-webkit-user-select:none;">
           <div class="${mauPrefixClass} modal-dialog" role="document">
             <div class="${mauPrefixClass} modal-content">
               <div class="${mauPrefixClass} modal-body">
-                <img id="${lightboxImgId}" style="user-select:none;-webkit-user-select:none;" class="img-fluid" alt="" />
+                <img id="${lightboxImgId}" style="user-select:none;-webkit-user-select:none;" class="${mauPrefixClass} img-fluid" alt="" />
                 ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="${mauPrefixClass} mg-prev" style="touch-action:manipulation;border:none;cursor:pointer;position:absolute;top:50%;left:-15px;background:white;"><span><</span></button>` : '<span style="display:none;" />'}
                 ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="${mauPrefixClass} mg-next" style="touch-action:manipulation;border:none;cursor:pointer;position:absolute;top:50%;right:-15px;background:white;}"><span>></span></button>` : '<span style="display:none;" />'}
               </div>
@@ -360,7 +360,7 @@ function mauGallery(opt = {}) {
       if (options.showTags) {
         showItemTags(target, options, tagsSet);
       }
-      const modal = document.querySelector(`#${options.lightboxId}`);
+      const modal = document.querySelector(`.${options.mauPrefixClass}#${options.lightboxId}`);
       generateListeners(target, modal, options);
     }
 
