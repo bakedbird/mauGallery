@@ -18,10 +18,111 @@ function mauGallery(opt = {}) {
   };
   let memoCurX = 0;
   let memoCurY = 0;
-  let memoScrollBehavior = '';
+  let memoScrollBehavior = null;
   const tagsSet = new Set();
 
   function injectMau(target, options) {
+    function saveCurrentCameraPosition() {
+      memoScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'smooth !important;'
+      memoCurX = window.scrollX;
+      memoCurY = window.scrollY;
+    }
+
+    function clearSaveCurrentCameraPositionSideEffects() {
+      document.documentElement.style.scrollBehavior = memoScrollBehavior;
+    }
+
+    function snapCamera(x, y, delay = 0) {
+      setTimeout(() => {
+        const oldScrollBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = 'auto !important;'
+        window.scrollTo({
+          top: y,
+          left: x,
+          behavior: 'auto'
+        });
+        document.documentElement.style.scrollBehavior = oldScrollBehavior;
+      }, delay);
+    }
+
+    function snapCameraToSavedPosition(delay = 2) {
+      snapCamera(memoCurX, memoCurY, delay);
+      clearSaveCurrentCameraPositionSideEffects();
+    }
+
+    function wrapItemInColumn(element, options) {
+      const style = (() => {
+        let style = document.createElement('style');
+        style.appendChild(document.createTextNode(''));
+        document.head.appendChild(style);
+        return style;
+      })();
+
+      function isOnMobile() {
+        return (navigator.userAgent.match(/Android/i)
+          || navigator.userAgent.match(/webOS/i)
+          || navigator.userAgent.match(/iPhone/i)
+          || navigator.userAgent.match(/iPad/i)
+          || navigator.userAgent.match(/iPod/i)
+          || navigator.userAgent.match(/BlackBerry/i)
+          || navigator.userAgent.match(/Windows Phone/i));
+      }
+
+      function doWrap(element, wrapperOpen, wrapperClose, options) {
+        orgHtml = element.outerHTML;
+        newHtml = wrapperOpen + orgHtml + wrapperClose;
+        element.outerHTML = newHtml;
+      }
+
+      const columns = options.columns;
+      const mauPrefixClass = options.mauPrefixClass;
+      const isImg = element.tagName === 'IMG';
+      const injectModalTrigger = isImg ? `data-bs-toggle="modal" data-bs-target=".${options.mauPrefixClass}#${options.lightboxId}"` : '';
+      let wrapperOpen = '';
+      let wrapperClose = '';
+      if (isOnMobile()) {
+        style.sheet.insertRule(`#${options.galleryRootNodeId} .${mauPrefixClass}.item-column a:focus {outline-style:none;box-shadow:none;border-color:transparent;}`, 0);
+      }
+      if (typeof columns === 'number') {
+        if (isImg) {
+          wrapperOpen = `<div class='${mauPrefixClass} item-column mb-4 col-${Math.ceil(12 / columns)}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
+          wrapperClose = '</a></div>';
+        } else {
+          wrapperOpen = `<div tabindex="0" class='${mauPrefixClass} item-column mb-4 col-${Math.ceil(12 / columns)}'><div style="width:100%;height:100%;">`;
+          wrapperClose = '</div></div>';
+        }
+        doWrap(element, wrapperOpen, wrapperClose, options);
+      } else if (typeof columns === 'object') {
+        let columnClasses = '';
+        if (columns.xs) {
+          columnClasses += ` col-${Math.ceil(12 / columns.xs)}`;
+        }
+        if (columns.sm) {
+          columnClasses += ` col-sm-${Math.ceil(12 / columns.sm)}`;
+        }
+        if (columns.md) {
+          columnClasses += ` col-md-${Math.ceil(12 / columns.md)}`;
+        }
+        if (columns.lg) {
+          columnClasses += ` col-lg-${Math.ceil(12 / columns.lg)}`;
+        }
+        if (columns.xl) {
+          columnClasses += ` col-xl-${Math.ceil(12 / columns.xl)}`;
+        }
+        if (isImg) {
+          wrapperOpen = `<div class='${mauPrefixClass} item-column mb-4${columnClasses}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
+          wrapperClose = '</a></div>';
+        } else {
+          wrapperOpen = `<div tabindex="0" class='${mauPrefixClass} item-column mb-4${columnClasses}'><div style="width:100%;height:100%;">`;
+          wrapperClose = '</div></div>';
+        }
+        doWrap(element, wrapperOpen, wrapperClose, options);
+      } else {
+        console.error(`Columns should be defined as numbers or objects. ${typeof columns} is not supported.`);
+      }
+    }
+
     function prevImage(options) {
       const filtersActiveTagId = options.filtersActiveTagId;
       const lightboxImgId = options.lightboxImgId;
@@ -162,78 +263,6 @@ function mauGallery(opt = {}) {
       }
     }
 
-    function wrapItemInColumn(element, options) {
-      const style = (() => {
-        let style = document.createElement('style');
-        style.appendChild(document.createTextNode(''));
-        document.head.appendChild(style);
-        return style;
-      })();
-
-      function isOnMobile() {
-        return (navigator.userAgent.match(/Android/i)
-          || navigator.userAgent.match(/webOS/i)
-          || navigator.userAgent.match(/iPhone/i)
-          || navigator.userAgent.match(/iPad/i)
-          || navigator.userAgent.match(/iPod/i)
-          || navigator.userAgent.match(/BlackBerry/i)
-          || navigator.userAgent.match(/Windows Phone/i));
-      }
-
-      function doWrap(element, wrapperOpen, wrapperClose, options) {
-        orgHtml = element.outerHTML;
-        newHtml = wrapperOpen + orgHtml + wrapperClose;
-        element.outerHTML = newHtml;
-      }
-
-      const columns = options.columns;
-      const mauPrefixClass = options.mauPrefixClass;
-      const isImg = element.tagName === 'IMG';
-      const injectModalTrigger = isImg ? `data-bs-toggle="modal" data-bs-target=".${options.mauPrefixClass}#${options.lightboxId}"` : '';
-      let wrapperOpen = '';
-      let wrapperClose = '';
-      if (isOnMobile()) {
-        style.sheet.insertRule(`#${options.galleryRootNodeId} .${mauPrefixClass}.item-column a:focus {outline-style:none;box-shadow:none;border-color:transparent;}`, 0);
-      }
-      if (typeof columns === 'number') {
-        if (isImg) {
-          wrapperOpen = `<div class='${mauPrefixClass} item-column mb-4 col-${Math.ceil(12 / columns)}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
-          wrapperClose = '</a></div>';
-        } else {
-          wrapperOpen = `<div tabindex="0" class='${mauPrefixClass} item-column mb-4 col-${Math.ceil(12 / columns)}'><div style="width:100%;height:100%;">`;
-          wrapperClose = '</div></div>';
-        }
-        doWrap(element, wrapperOpen, wrapperClose, options);
-      } else if (typeof columns === 'object') {
-        let columnClasses = '';
-        if (columns.xs) {
-          columnClasses += ` col-${Math.ceil(12 / columns.xs)}`;
-        }
-        if (columns.sm) {
-          columnClasses += ` col-sm-${Math.ceil(12 / columns.sm)}`;
-        }
-        if (columns.md) {
-          columnClasses += ` col-md-${Math.ceil(12 / columns.md)}`;
-        }
-        if (columns.lg) {
-          columnClasses += ` col-lg-${Math.ceil(12 / columns.lg)}`;
-        }
-        if (columns.xl) {
-          columnClasses += ` col-xl-${Math.ceil(12 / columns.xl)}`;
-        }
-        if (isImg) {
-          wrapperOpen = `<div class='${mauPrefixClass} item-column mb-4${columnClasses}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
-          wrapperClose = '</a></div>';
-        } else {
-          wrapperOpen = `<div tabindex="0" class='${mauPrefixClass} item-column mb-4${columnClasses}'><div style="width:100%;height:100%;">`;
-          wrapperClose = '</div></div>';
-        }
-        doWrap(element, wrapperOpen, wrapperClose, options);
-      } else {
-        console.error(`Columns should be defined as numbers or objects. ${typeof columns} is not supported.`);
-      }
-    }
-
     function generateRowWrapper(target, item, options, tagsSet) {
       if (item.tagName === 'IMG') {
         item.classList.add('img-fluid');
@@ -247,35 +276,6 @@ function mauGallery(opt = {}) {
       if (options.showTags && tag !== undefined) {
         tagsSet.add(tag);
       }
-    }
-
-    function saveCurrentCameraPosition() {
-      memoScrollBehavior = document.documentElement.style.scrollBehavior;
-      document.documentElement.style.scrollBehavior = 'smooth !important;'
-      memoCurX = window.scrollX;
-      memoCurY = window.scrollY;
-    }
-
-    function clearSaveCurrentCameraPositionSideEffects() {
-      document.documentElement.style.scrollBehavior = memoScrollBehavior;
-    }
-
-    function snapCamera(x, y, delay = 0) {
-      setTimeout(() => {
-        const oldScrollBehavior = document.documentElement.style.scrollBehavior;
-        document.documentElement.style.scrollBehavior = 'auto !important;'
-        window.scrollTo({
-          top: y,
-          left: x,
-          behavior: 'auto'
-        });
-        document.documentElement.style.scrollBehavior = oldScrollBehavior;
-      }, delay);
-    }
-
-    function snapCameraToSavedPosition(delay = 2) {
-      snapCamera(memoCurX, memoCurY, delay);
-      clearSaveCurrentCameraPositionSideEffects();
     }
 
     function generateListeners(gallery, modal, options) {
