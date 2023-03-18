@@ -191,7 +191,7 @@ function mauGallery(opt = {}) {
       let wrapperOpen = '';
       let wrapperClose = '';
       if (isOnMobile()) {
-        style.sheet.insertRule(`#${options.galleryRootNodeId} ${mauPrefixClass}.item-column a:focus { outline: none !important; }`, 0);
+        style.sheet.insertRule(`#${options.galleryRootNodeId} .${mauPrefixClass}.item-column a:focus {outline-style:none;box-shadow:none;border-color:transparent;}`, 0);
       }
       if (typeof columns === 'number') {
         if (isImg) {
