@@ -247,7 +247,7 @@ function mauGallery(opt = {}) {
       }
     }
 
-    function generateListeners(gallery, options) {
+    function generateListeners(gallery, modal, options) {
       function handleKeyDown(event) {
         if (event.keyCode == 37 || event.key === 'ArrowLeft') {
           prevImage(options);
@@ -256,11 +256,11 @@ function mauGallery(opt = {}) {
           nextImage(options);
         }
       }
+
       elements = gallery.querySelectorAll(`.${options.mauPrefixClass}.${options.galleryItemClass}`);
       elements.forEach(element => element.parentNode.addEventListener('click', (event) => {
-        event.preventDefault();
         if (options.lightBox && element.tagName === 'IMG') {
-          lightBoxOnOpen(element, options.lightboxId, options.lightboxImgId);
+          lightBoxOnOpen(modal, element, options);
         }
       }));
 
@@ -269,26 +269,14 @@ function mauGallery(opt = {}) {
       const galleryElementMgNext = gallery.querySelector(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.mg-next`);
 
       galleryElementNavLinks.forEach(navlink => {
-        navlink.addEventListener('click', (event) => {
-          event.preventDefault();
-          filterByTag(event.target, options);
-        });
+        navlink.addEventListener('click', (event) => filterByTag(event.target, options));
       });
       galleryElementMgPrev.addEventListener('click', () => prevImage(options));
       galleryElementMgNext.addEventListener('click', () => nextImage(options));
 
-      const modal = document.querySelector(`#${options.lightboxId}`);
       modal.addEventListener('shown.bs.modal', () => {
         memoCurX = window.scrollX;
         memoCurY = window.scrollY;
-        if (options.navigation) {
-          const buttons = modal.querySelectorAll('button');
-          let index = 1;
-          for (const button of buttons) {
-            button.setAttribute('tabindex', index);
-            index += 1;
-          }
-        }
         document.addEventListener('keydown', handleKeyDown);
       });
 
@@ -313,10 +301,18 @@ function mauGallery(opt = {}) {
       });
     }
 
-    function lightBoxOnOpen(element, lightboxId, lightboxImgId) {
-      const e = document.querySelector(`#${lightboxId}`);
-      const img = e.querySelector(`#${lightboxImgId}`);
+    function lightBoxOnOpen(modal, element, options) {
+      const e = document.querySelector(`#${options.lightboxId}`);
+      const img = e.querySelector(`#${options.lightboxImgId}`);
       img.setAttribute('src', element.getAttribute('src'));
+      if (options.navigation) {
+        const buttons = modal.querySelectorAll('button');
+        let index = 1;
+        for (const button of buttons) {
+          button.setAttribute('tabindex', index);
+          index += 1;
+        }
+      }
     }
 
     function createLightBox(gallery, options) {
@@ -364,7 +360,8 @@ function mauGallery(opt = {}) {
       if (options.showTags) {
         showItemTags(target, options, tagsSet);
       }
-      generateListeners(target, options);
+      const modal = document.querySelector(`#${options.lightboxId}`);
+      generateListeners(target, modal, options);
     }
 
     process(target, options);
