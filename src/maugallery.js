@@ -212,9 +212,7 @@ function mauGallery(opt = {}) {
         const mauPrefixClass = options.mauPrefixClass;
         const rootNode = document.querySelector(`.${mauPrefixClass}#${galleryItemsRowId}`);
         rootNode.style.animationName = 'none';
-        window.requestAnimationFrame(() => {
-          rootNode.style.animationName = null;
-        });
+        window.requestAnimationFrame(() => rootNode.style.animationName = null);
       }
 
       if (element.id === options.filtersActiveTagId) {
@@ -246,13 +244,8 @@ function mauGallery(opt = {}) {
       const tagsPosition = options.tagsPosition;
       const activeTagId = options.filtersActiveTagId;
       const disableFiltersButtonLabel = options.disableFiltersButtonLabel;
-      let tagItems =
-        `<li class="nav-item"><button style="touch-action:manipulation;" class="${options.mauPrefixClass} nav-link active" data-images-toggle="all" id="${activeTagId}">${disableFiltersButtonLabel}</button></li>`;
-      tagsSet.forEach(value => {
-        tagItems += `<li class="nav-item">
-                <button style="touch-action:manipulation;" class="${options.mauPrefixClass} nav-link" data-images-toggle="${value}">${value}</button></li>`;
-      });
-
+      let tagItems = `<li class="nav-item"><button style="touch-action:manipulation;" class="${options.mauPrefixClass} nav-link active" data-images-toggle="all" id="${activeTagId}">${disableFiltersButtonLabel}</button></li>`;
+      tagsSet.forEach(value => tagItems += `<li class="nav-item"><button style="touch-action:manipulation;" class="${options.mauPrefixClass} nav-link" data-images-toggle="${value}">${value}</button></li>`);
       const tagsRow = `<ul class="my-4 tags-bar nav nav-pills">${tagItems}</ul>`;
       if (tagsPosition === 'bottom') {
         gallery.innerHTML = gallery.innerHTML + tagsRow;
@@ -289,7 +282,7 @@ function mauGallery(opt = {}) {
       }
 
       elements = gallery.querySelectorAll(`.${options.mauPrefixClass}.${options.galleryItemClass}`);
-      elements.forEach(element => element.parentNode.addEventListener('click', (event) => {
+      elements.forEach(element => element.parentNode.addEventListener('click', () => {
         if (options.lightBox && element.tagName === 'IMG') {
           lightBoxOnOpen(modal, element, options);
         }
@@ -299,11 +292,7 @@ function mauGallery(opt = {}) {
       const galleryElementMgPrev = gallery.querySelector(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.mg-prev`);
       const galleryElementMgNext = gallery.querySelector(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.mg-next`);
 
-      galleryElementNavLinks.forEach(navlink => {
-        navlink.addEventListener('click', (event) => {
-          filterByTag(event.target, options);
-        });
-      });
+      galleryElementNavLinks.forEach(navlink => navlink.addEventListener('click', (event) => filterByTag(event.target, options)));
       galleryElementMgPrev.addEventListener('click', () => prevImage(options));
       galleryElementMgNext.addEventListener('click', () => nextImage(options));
 
@@ -315,9 +304,7 @@ function mauGallery(opt = {}) {
       modal.addEventListener('hidden.bs.modal', () => {
         if (options.navigation) {
           const buttons = modal.querySelectorAll('button');
-          for (const button of buttons) {
-            button.removeAttribute('tabindex');
-          }
+          buttons.forEach(button => button.removeAttribute('tabindex'));
         }
         snapCameraToSavedPosition();
         document.removeEventListener('keydown', handleKeyDown);
