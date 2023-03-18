@@ -144,10 +144,10 @@ function mauGallery(opt = {}) {
       const activeTagId = options.filtersActiveTagId;
       const disableFiltersButtonLabel = options.disableFiltersButtonLabel;
       let tagItems =
-        `<li class="nav-item"><button class="${options.mauPrefixClass} nav-link active" data-images-toggle="all" id="${activeTagId}">${disableFiltersButtonLabel}</span></li>`;
+        `<li class="nav-item"><div class="${options.mauPrefixClass} nav-link active" data-images-toggle="all" id="${activeTagId}">${disableFiltersButtonLabel}</button></li>`;
       tagsSet.forEach(value => {
         tagItems += `<li class="nav-item">
-                <button class="${options.mauPrefixClass} nav-link" data-images-toggle="${value}">${value}</span></li>`;
+                <button class="${options.mauPrefixClass} nav-link" data-images-toggle="${value}">${value}</button></li>`;
       });
 
       const tagsRow = `<ul class="my-4 tags-bar nav nav-pills">${tagItems}</ul>`;
