@@ -61,7 +61,7 @@ function mauGallery(opt = {}) {
         imagesCollection[index] ??
         imagesCollection[imagesCollection.length - 1];
 
-      document.querySelector(`#${lightboxImgId}`).setAttribute('src', prev.getAttribute('src'));
+      document.querySelector(`.${mauPrefixClass}#${lightboxImgId}`).setAttribute('src', prev.getAttribute('src'));
     }
 
     function nextImage(options) {
@@ -105,8 +105,10 @@ function mauGallery(opt = {}) {
     }
 
     function filterByTag(element, options) {
-      function forceRedraw(galleryItemsRowId) {
-        const rootNode = document.querySelector(`#${galleryItemsRowId}`);
+      function forceRedraw(options) {
+        const galleryItemsRowId = options.galleryItemsRowId;
+        const mauPrefixClass = options.mauPrefixClass;
+        const rootNode = document.querySelector(`.${mauPrefixClass}#${galleryItemsRowId}`);
         rootNode.style.animation = 'none';
         rootNode.style.display = 'none';
         rootNode.offsetHeight;
@@ -120,7 +122,7 @@ function mauGallery(opt = {}) {
       if (element.id === options.filtersActiveTagId) {
         return;
       }
-      forceRedraw(options.galleryItemsRowId);
+      forceRedraw(options);
       const galleryItems = document.querySelectorAll(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.${options.galleryItemClass}`);
       const activeTag = document.querySelector(`.${options.mauPrefixClass}#${options.filtersActiveTagId}`);
       const tag = element.dataset.imagesToggle;
@@ -237,7 +239,7 @@ function mauGallery(opt = {}) {
         item.classList.add('img-fluid');
       }
 
-      const parent = target.querySelector(`#${options.galleryItemsRowId}`);
+      const parent = target.querySelector(`.${options.mauPrefixClass}#${options.galleryItemsRowId}`);
       parent.append(item);
 
       wrapItemInColumn(item, options);
@@ -338,17 +340,17 @@ function mauGallery(opt = {}) {
       gallery.innerHTML = gallery.innerHTML + lightbox;
     }
 
-    function createRowWrapper(element) {
+    function createRowWrapper(element, options) {
       if (!element.classList.contains('row')) {
         const div = document.createElement('div');
         div.id = options.galleryItemsRowId;
-        div.classList.add('row');
+        div.classList.add(options.mauPrefixClass, 'row');
         element.append(div);
       }
     }
 
     function process(target, options) {
-      createRowWrapper(target);
+      createRowWrapper(target, options);
       if (options.lightBox) {
         createLightBox(target, options);
       }
