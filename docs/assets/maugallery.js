@@ -331,11 +331,7 @@ function mauGallery(opt = {}) {
       img.setAttribute('src', element.getAttribute('src'));
       if (options.navigation) {
         const buttons = modal.querySelectorAll('button');
-        let index = 1;
-        for (const button of buttons) {
-          button.setAttribute('tabindex', index);
-          index += 1;
-        }
+        buttons.forEach(button => button.setAttribute('tabindex', 0));
       }
     }
 
