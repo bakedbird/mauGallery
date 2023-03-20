@@ -218,18 +218,18 @@ function mauGallery(opt = {}) {
       setGalleryImgDisplayStyle(img, 'block');
     }
 
-    function initializeModalImg(element, whitelist) {
-      function purgeModalImg(element, whitelist) {
+    function initializeModalImg(element, htmlAttributesWhitelist) {
+      function purgeModalImg(element, htmlAttributesWhitelist) {
         const toRemove = [];
         for (let i = 0, attrs = element.attributes; attrs[i]; i++) {
           let attrKey = attrs[i].nodeName;
-          if (whitelist.indexOf(attrKey) === -1) {
+          if (htmlAttributesWhitelist.indexOf(attrKey) === -1) {
             toRemove.push(attrKey);
           }
         }
         toRemove.forEach(attrKey => element.removeAttribute(attrKey));
       }
-      purgeModalImg(element, whitelist);
+      purgeModalImg(element, htmlAttributesWhitelist);
 
       const alt = element.getAttribute('alt');
       const srcset = element.getAttribute('srcset') ?? null;
@@ -379,7 +379,7 @@ function mauGallery(opt = {}) {
       } else if (tagsPosition === 'top') {
         gallery.innerHTML = tagsRow + gallery.innerHTML;
       } else {
-        console.error(`Unknown tags position: ${tagsPosition}`);
+        throw new Error(`Unknown tags position: ${tagsPosition}`);
       }
     }
 
@@ -505,18 +505,20 @@ function mauGallery(opt = {}) {
       const prevImgBtnLabel = options('prevImgButtonLabel');
       const nextImgBtnLabel = options('nextImgButtonLabel');
       const mauPrefixClass = options('mauPrefixClass');
-      const whitelist = ['src', 'alt', 'srcset', 'sizes', 'data-gallery-tag'];
+      const htmlAttributesWhitelist = ['src', 'alt', 'srcset', 'sizes', 'data-gallery-tag'];
 
       let allOuterHTML = '';
       memos('richGalleryItems').forEach(galleryItem => {
         let currentElement = null;
         if (galleryItem.picture) {
           currentElement = galleryItem.picture.cloneNode(deep = true);
+          initializeModalImg(currentElement.querySelector('img'), htmlAttributesWhitelist);
         } else if (galleryItem.item.tagName === 'IMG') {
           currentElement = galleryItem.item.cloneNode(deep = true);
+          initializeModalImg(currentElement, htmlAttributesWhitelist);
         }
         if (currentElement) {
-          initializeModalImg(currentElement, whitelist);
+          initializeModalImg(currentElement, htmlAttributesWhitelist);
           currentElement.style.display = 'none';
           allOuterHTML += currentElement.outerHTML;
         }
@@ -552,15 +554,11 @@ function mauGallery(opt = {}) {
       }
 
       const arrowTransitionDelay = animationStyleProperty('modal', 'arrowTransitionDelay');
-
       const animationName = animationStyleProperty('gallery', 'animationName');
       const animationKeyframes = animationStyleProperty('gallery', 'animationKeyframes');
       const animationDurationOnFilter = animationStyleProperty('gallery', 'animationDurationOnFilter');
       const animationEasing = animationStyleProperty('gallery', 'animationEasing');
       const animationDurationOnModalAppear = animationStyleProperty('gallery', 'animationDurationOnModalAppear');
-
-      const mauPrefixClass = options('mauPrefixClass');
-      const galleryItemsRowId = options('galleryItemsRowId');
 
       const modalNavigation = optionsStyles.modal.navigation;
       const modalNavigationFontSize = modalNavigation['fontSize'];
@@ -569,6 +567,8 @@ function mauGallery(opt = {}) {
       const animationRuleValue = `${animationName} ${animationDurationOnFilter} ${animationEasing}`;
       const modalAnimationRuleValue = `${animationName} ${animationDurationOnModalAppear} ${animationEasing}`;
 
+      const mauPrefixClass = options('mauPrefixClass');
+      const galleryItemsRowId = options('galleryItemsRowId');
       const fontSize = modalNavigationFontSize ?? `calc(${modalArrowBoxesSize} / 2)`;
 
       const rules = {
