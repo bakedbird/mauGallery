@@ -31,8 +31,8 @@ function mauGallery(opt = {}) {
       },
       'modal': {
         'navigation': {
-          'arrowBoxesSize': '50px',
-          'fontSize': null
+          'arrowBoxesSize': {size: '50', unit: 'px'},
+          'forcedFontSize': null
         }
       }
     }
@@ -77,16 +77,15 @@ function mauGallery(opt = {}) {
   }
 
   function memos(key, newValue = undefined) {
-    const obj = props.memos;
-    if (!(key in obj)) {
+    if (!(key in props.memos)) {
       throw new Error(`No memo value found with this key: ${key}`);
     }
 
     if (newValue !== undefined) {
-      obj[key] = newValue;
+      props.memos[key] = newValue;
       return;
     }
-    const value = obj[key];
+    const value = props.memos[key];
     return value;
   }
 
@@ -99,7 +98,7 @@ function mauGallery(opt = {}) {
           || navigator.userAgent.match(/iPad/i)
           || navigator.userAgent.match(/iPod/i)
           || navigator.userAgent.match(/BlackBerry/i)
-          || navigator.userAgent.match(/Windows Phone/i)));
+          || navigator.userAgent.match(/Windows Phone/i)) === true);
       }
       return memos('isOnMobile');
     }
@@ -526,8 +525,8 @@ function mauGallery(opt = {}) {
       const lightbox = `
         <div class="${mauPrefixClass} modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" tabindex="-1" role="dialog" aria-hidden="true" style="user-select:none;-webkit-user-select:none;">
           <div class="${mauPrefixClass} modal-dialog modal-dialog-centered" role="document">
-            <div class="${mauPrefixClass} modal-content">
-              <div class="${mauPrefixClass} modal-body" style="display:flex;align-items:center;justify-content:center;padding:0;margin:16px;">
+            <div class="${mauPrefixClass} modal-content style="border-width:16px;border-color:#fff">
+              <div class="${mauPrefixClass} modal-body" style="display:flex;align-items:center;justify-content:center;">
                 ${allOuterHTML}
               </div>
               ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="${mauPrefixClass} mg-prev" style="touch-action:manipulation;border:none;background:#fff;"><span><</span></button>` : '<span style="display:none;" />'}
@@ -561,15 +560,20 @@ function mauGallery(opt = {}) {
       const animationDurationOnModalAppear = animationStyleProperty('gallery', 'animationDurationOnModalAppear');
 
       const modalNavigation = optionsStyles.modal.navigation;
-      const modalNavigationFontSize = modalNavigation['fontSize'];
-      const modalArrowBoxesSize = modalNavigation['arrowBoxesSize'];
+      const modalNavigationFontSize = modalNavigation['forcedFontSize'];
+      const modalArrowBoxesSize = modalNavigation['arrowBoxesSize'].size;
+      const modalArrowBoxesSizeUnit = modalNavigation['arrowBoxesSize'].unit;
+      const modalArrowBoxesSizeHalf = Math.trunc(modalArrowBoxesSize / 2); //
 
       const animationRuleValue = `${animationName} ${animationDurationOnFilter} ${animationEasing}`;
       const modalAnimationRuleValue = `${animationName} ${animationDurationOnModalAppear} ${animationEasing}`;
 
       const mauPrefixClass = options('mauPrefixClass');
       const galleryItemsRowId = options('galleryItemsRowId');
-      const fontSize = modalNavigationFontSize ?? `calc(${modalArrowBoxesSize} / 2)`;
+      const modalArrowSizeRuleValue = modalArrowBoxesSize + modalArrowBoxesSizeUnit;
+      const modalArrowHalfSizeRuleValue = modalArrowBoxesSizeHalf + modalArrowBoxesSizeUnit;
+
+      const fontSize = modalNavigationFontSize ?? modalArrowHalfSizeRuleValue;
 
       const rules = {
         'animationKeyframes': `@keyframes ${animationName} ${animationKeyframes}`,
@@ -585,24 +589,24 @@ function mauGallery(opt = {}) {
           .${mauPrefixClass}.mg-next, .${mauPrefixClass}.mg-prev {
             display: block;
             position: absolute;
-            bottom: calc(50% - calc(${modalArrowBoxesSize} / 2));
-            width: ${modalArrowBoxesSize};
-            height: ${modalArrowBoxesSize};
+            bottom: calc(50% - ${modalArrowHalfSizeRuleValue});
+            width: ${modalArrowSizeRuleValue};
+            height: ${modalArrowSizeRuleValue};
             border-radius: 0;
             font-size: ${fontSize};
             transition: left ${arrowTransitionDelay}, right ${arrowTransitionDelay};
           }`,
         'navigationButtonRight': `
           .${mauPrefixClass}.mg-next {
-            --_delta: calc(${modalArrowBoxesSize} * .1);
-            --_negative-value: -${modalArrowBoxesSize};
+            --_delta: calc(${modalArrowSizeRuleValue} * .1);
+            --_negative-value: -${modalArrowSizeRuleValue};
             --_right: calc(var(--_negative-value) + var(--_delta));
             right: var(--_right)
           }`,
         'navigationButtonLeft': `
           .${mauPrefixClass}.mg-prev {
-            --_delta: calc(${modalArrowBoxesSize} * .1);
-            --_negative-value: -${modalArrowBoxesSize};
+            --_delta: calc(${modalArrowSizeRuleValue} * .1);
+            --_negative-value: -${modalArrowSizeRuleValue};
             --_left: calc(var(--_negative-value) + var(--_delta));
             left: var(--_left);
           }`,
@@ -611,7 +615,7 @@ function mauGallery(opt = {}) {
             .mau.mg-next, .mau.mg-prev {
               left: calc(var(--_left) / 12);
               right: calc(var(--_right) / 12);
-              margin: 0 calc(${modalArrowBoxesSize} * .1);
+              margin: 0 var(--_delta);
               transition: left ${arrowTransitionDelay}, right ${arrowTransitionDelay};
             }
           }`
