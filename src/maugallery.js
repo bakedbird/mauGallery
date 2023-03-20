@@ -45,38 +45,74 @@ function mauGallery(opt = {}) {
     return style;
   })();
 
-  let memoCurX = 0;
-  let memoCurY = 0;
-  let memoScrollBehavior = null;
-  let memoIsOnMobile = null;
-  let memoRichGalleryItems = null;
-  let memoTab = false;
-  let memoTabTimeout = null;
-  const tagsSet = new Set();
+  const props = {
+    'memos': {
+      'curX': 0,
+      'curY': 0,
+      'scrollBehavior': null,
+      'isOnMobile': null,
+      'richGalleryItems': null,
+      'tab': false,
+      'tabTimeout': null
+    },
+    'options': mauGallerydefaults,
+    'tagsSet': new Set()
+  }
 
-  function injectMau(target, options) {
+  Object.seal(props);
+  Object.seal(props.memos);
+
+  function tagsSet() {
+    return props.tagsSet;
+  }
+
+  function options(key) {
+    const obj = props.options;
+    if (!(key in obj)) {
+      throw new Error(`No option value found with this key: ${key}`);
+    }
+
+    const value = obj[key];
+    return value;
+  }
+
+  function memos(key, newValue = undefined) {
+    const obj = props.memos;
+    if (!(key in obj)) {
+      throw new Error(`No memo value found with this key: ${key}`);
+    }
+
+    if (newValue !== undefined) {
+      obj[key] = newValue;
+      return;
+    }
+    const value = obj[key];
+    return value;
+  }
+
+  function injectMau(props) {
     function isOnMobile() {
-      if (memoIsOnMobile === null) {
-        memoIsOnMobile = (navigator.userAgent.match(/Android/i)
+      if (memos('isOnMobile') === null) {
+        memos('isOnMobile', (navigator.userAgent.match(/Android/i)
           || navigator.userAgent.match(/webOS/i)
           || navigator.userAgent.match(/iPhone/i)
           || navigator.userAgent.match(/iPad/i)
           || navigator.userAgent.match(/iPod/i)
           || navigator.userAgent.match(/BlackBerry/i)
-          || navigator.userAgent.match(/Windows Phone/i));
+          || navigator.userAgent.match(/Windows Phone/i)));
       }
-      return memoIsOnMobile;
+      return memos('isOnMobile');
     }
 
     function saveCurrentCameraPosition() {
-      memoScrollBehavior = document.documentElement.style.scrollBehavior;
+      memos('scrollBehavior', document.documentElement.style.scrollBehavior);
       document.documentElement.style.scrollBehavior = 'smooth !important;'
-      memoCurX = window.scrollX;
-      memoCurY = window.scrollY;
+      memos('curX', window.scrollX);
+      memos('curY', window.scrollY);
     }
 
     function clearSaveCurrentCameraPositionSideEffects() {
-      document.documentElement.style.scrollBehavior = memoScrollBehavior;
+      document.documentElement.style.scrollBehavior = memos('scrollBehavior');
     }
 
     function snapCamera(x, y, delay = 0) {
@@ -97,26 +133,29 @@ function mauGallery(opt = {}) {
 
     function snapCameraToSavedPosition(delay = 0) {
       for (let i = 0; i < 25; i++) {
-        snapCamera(memoCurX, memoCurY, delay + i);
+        snapCamera(memos('curX'), memos('curY'), delay + i);
       }
       clearSaveCurrentCameraPositionSideEffects();
     }
 
-    function wrapItemInColumn(element, options) {
+    function wrapItemInColumn(element) {
       function doWrap(element, wrapperOpen, wrapperClose) {
         orgHtml = element.outerHTML;
         newHtml = wrapperOpen + orgHtml + wrapperClose;
         element.outerHTML = newHtml;
       }
 
-      const columns = options.columns;
-      const mauPrefixClass = options.mauPrefixClass;
+      const columns = options('columns');
+      const mauPrefixClass = options('mauPrefixClass');
+      const lightboxId = options('lightboxId');
+      const modalTriggerClass = options('modalTriggerClass');
+      const galleryRootNodeId = options('galleryRootNodeId');
       const isImg = element.tagName === 'IMG' || element.tagName === 'PICTURE';
-      const injectModalTrigger = `data-bs-toggle="modal" data-bs-target=".${mauPrefixClass}#${options.lightboxId}" class="${mauPrefixClass} ${options.modalTriggerClass}"`;
+      const injectModalTrigger = `data-bs-toggle="modal" data-bs-target=".${mauPrefixClass}#${lightboxId}" class="${mauPrefixClass} ${modalTriggerClass}"`;
       let wrapperOpen = '';
       let wrapperClose = '';
       if (isOnMobile()) {
-        style.sheet.insertRule(`#${options.galleryRootNodeId} .${mauPrefixClass}.item-column a:focus {outline-style:none;box-shadow:none;border-color:transparent;}`, 0);
+        style.sheet.insertRule(`#${galleryRootNodeId} .${mauPrefixClass}.item-column a:focus {outline-style:none;box-shadow:none;border-color:transparent;}`, 0);
       }
       if (typeof columns === 'number') {
         if (isImg) {
@@ -128,6 +167,12 @@ function mauGallery(opt = {}) {
         }
         doWrap(element, wrapperOpen, wrapperClose);
       } else if (typeof columns === 'object') {
+        const columnsObjSchema = {'xs': '', 'sm': '', 'md': '', 'lg': '', 'xl': ''}
+        Object.keys(columns).forEach(key => {
+          if (!(key in columnsObjSchema)) {
+            throw new Error(`Unknown columns key: ${key}.`);
+          }
+        });
         let columnClasses = '';
         if (columns.xs) {
           columnClasses += ` col-${Math.ceil(12 / columns.xs)}`;
@@ -153,27 +198,27 @@ function mauGallery(opt = {}) {
         }
         doWrap(element, wrapperOpen, wrapperClose);
       } else {
-        console.error(`Columns should be defined as numbers or objects. ${typeof columns} is not supported.`);
+        throw new Error(`Columns should be defined as numbers or objects. ${typeof columns} is not supported.`);
       }
     }
 
-    function setImgToOff(img) {
+    function setGalleryImgDisplayStyle(img, displayStyle) {
       if (img.parentNode.tagName === 'PICTURE') {
-        img.parentNode.style.display = 'none';
+        img.parentNode.style.display = displayStyle;
       } else {
-        img.style.display = 'none';
+        img.style.display = displayStyle;
       }
     }
 
-    function setImgToOn(img) {
-      if (img.parentNode.tagName === 'PICTURE') {
-        img.parentNode.style.display = 'block';
-      } else {
-        img.style.display = 'block';
-      }
+    function setGalleryImgToOff(img) {
+      setGalleryImgDisplayStyle(img, 'none');
     }
 
-    function initializeModalImg(element, whitelist, options) {
+    function setGalleryImgToOn(img) {
+      setGalleryImgDisplayStyle(img, 'block');
+    }
+
+    function initializeModalImg(element, whitelist) {
       function purgeModalImg(element, whitelist) {
         const toRemove = [];
         for (let i = 0, attrs = element.attributes; attrs[i]; i++) {
@@ -189,7 +234,7 @@ function mauGallery(opt = {}) {
       const alt = element.getAttribute('alt');
       const srcset = element.getAttribute('srcset') ?? null;
       const sizes = element.getAttribute('sizes') ?? null;
-      element.className = `${options.mauPrefixClass} img-fluid`;
+      element.className = `${options('mauPrefixClass')} img-fluid`;
       element.setAttribute('alt', alt);
       if (srcset) {
         element.setAttribute('srcset', srcset);
@@ -199,9 +244,9 @@ function mauGallery(opt = {}) {
       }
     }
 
-    function buildImagesCollection(modal, options) {
-      const mauPrefixClass = options.mauPrefixClass;
-      const filtersActiveTagId = options.filtersActiveTagId;
+    function buildImagesCollection(modal) {
+      const mauPrefixClass = options('mauPrefixClass');
+      const filtersActiveTagId = options('filtersActiveTagId');
       const activeTag = document.querySelector(`.${mauPrefixClass}#${filtersActiveTagId}`).dataset.imagesToggle;
       const attributeFilter = activeTag === 'all' ? '' : `[data-gallery-tag="${activeTag}"]`;
       const galleryItems = modal.querySelectorAll(`img.${mauPrefixClass}${attributeFilter}`);
@@ -209,13 +254,21 @@ function mauGallery(opt = {}) {
       return galleryItems;
     }
 
-    function getCurrentModalImage(modal, options) {
-      return modal.querySelector(`#${options.lightboxImgId}`);
+    function getCurrentModalImage(modal) {
+      return modal.querySelector(`#${options('lightboxImgId')}`);
     }
 
-    function prevImage(modal, options) {
-      const imagesCollection = buildImagesCollection(modal, options);
-      const activeImage = getCurrentModalImage(modal, options);
+    function updateModalImg(modal, newModalImg) {
+      const oldModalImg = getCurrentModalImage(modal);
+      setGalleryImgToOn(newModalImg);
+      setGalleryImgToOff(oldModalImg);
+      oldModalImg.removeAttribute('id');
+      newModalImg.id = options('lightboxImgId');
+    }
+
+    function prevImage(modal) {
+      const imagesCollection = buildImagesCollection(modal);
+      const activeImage = getCurrentModalImage(modal);
 
       let index = 0;
       for (const image of imagesCollection) {
@@ -228,16 +281,12 @@ function mauGallery(opt = {}) {
       const prev =
         imagesCollection[index] ??
         imagesCollection[imagesCollection.length - 1];
-      const oldModalImg = modal.querySelector(`#${options.lightboxImgId}`);
-      setImgToOn(prev);
-      setImgToOff(oldModalImg);
-      oldModalImg.removeAttribute('id');
-      prev.id = options.lightboxImgId;
+      updateModalImg(modal, prev);
     }
 
-    function nextImage(modal, options) {
-      const imagesCollection = buildImagesCollection(modal, options);
-      const activeImage = getCurrentModalImage(modal, options);
+    function nextImage(modal) {
+      const imagesCollection = buildImagesCollection(modal);
+      const activeImage = getCurrentModalImage(modal);
 
       let index = 0;
       for (const image of imagesCollection) {
@@ -247,36 +296,34 @@ function mauGallery(opt = {}) {
         }
       }
       const next = imagesCollection[index] ?? imagesCollection[0];
-      const oldModalImg = modal.querySelector(`#${options.lightboxImgId}`);
-      setImgToOn(next);
-      setImgToOff(oldModalImg);
-      oldModalImg.removeAttribute('id');
-      next.id = options.lightboxImgId;
+      updateModalImg(modal, next);
     }
 
-    function getRichGalleryItems(options, lazy = true) {
-      if (lazy && memoRichGalleryItems) {
-        return memoRichGalleryItems;
+    function getRichGalleryItems(lazy = true) {
+      if (lazy && memos('richGalleryItems')) {
+        return memos('richGalleryItems');
       }
-      const columns = document.querySelectorAll(`div.${options.mauPrefixClass}.item-column`);
+      const mauPrefixClass = options('mauPrefixClass');
+      const galleryItemClass = options('galleryItemClass');
+      const columns = document.querySelectorAll(`div.${mauPrefixClass}.item-column`);
       const dataEntries = [];
       let picture = null;
       columns.forEach(column => {
-        const item = column.querySelector(`.${options.mauPrefixClass}.${options.galleryItemClass}`);
+        const item = column.querySelector(`.${mauPrefixClass}.${galleryItemClass}`);
         if (item.parentNode.tagName === 'PICTURE') {
           picture = item.parentNode;
         }
         const entry = { item, column, picture };
         dataEntries.push(entry);
       });
-      memoRichGalleryItems = dataEntries;
+      memos('richGalleryItems', dataEntries);
       return dataEntries;
     }
 
-    function filterByTag(element, options) {
-      function forceReplayAnim(options) {
-        const galleryItemsRowId = options.galleryItemsRowId;
-        const mauPrefixClass = options.mauPrefixClass;
+    function filterByTag(element) {
+      function forceReplayAnim() {
+        const galleryItemsRowId = options('galleryItemsRowId');
+        const mauPrefixClass = options('mauPrefixClass');
         const rootNode = document.querySelector(`.${mauPrefixClass}#${galleryItemsRowId}`);
         if (!isOnMobile()) {
           const oldAnimation = rootNode.style.animation;
@@ -292,20 +339,22 @@ function mauGallery(opt = {}) {
         window.requestAnimationFrame(() => rootNode.style.animationName = oldAnimationName);
       }
 
-      if (element.id === options.filtersActiveTagId) {
+      if (element.id === options('filtersActiveTagId')) {
         return;
       }
 
       saveCurrentCameraPosition();
-      forceReplayAnim(options);
-      const richGalleryItems = getRichGalleryItems(options, lazy = false);
-      const activeTag = document.querySelector(`.${options.mauPrefixClass}#${options.filtersActiveTagId}`);
+      forceReplayAnim();
+      const richGalleryItems = getRichGalleryItems(lazy = false);
+      const mauPrefixClass = options('mauPrefixClass');
+      const filtersActiveTagId = options('filtersActiveTagId');
+      const activeTag = document.querySelector(`.${mauPrefixClass}#${filtersActiveTagId}`);
       const tag = element.dataset.imagesToggle;
 
       activeTag.classList.remove('active');
       activeTag.removeAttribute('id');
-      element.classList.add(options.mauPrefixClass, 'active');
-      element.id = options.filtersActiveTagId;
+      element.classList.add(mauPrefixClass, 'active');
+      element.id = filtersActiveTagId;
 
       richGalleryItems.forEach(richItem => {
         if (tag === 'all' || richItem.item.dataset.galleryTag === tag) {
@@ -317,12 +366,13 @@ function mauGallery(opt = {}) {
       });
     }
 
-    function showItemTags(gallery, options, tagsSet) {
-      const tagsPosition = options.tagsPosition;
-      const activeTagId = options.filtersActiveTagId;
-      const disableFiltersButtonLabel = options.disableFiltersButtonLabel;
-      let tagItems = `<li class="nav-item"><button style="touch-action:manipulation;" class="${options.mauPrefixClass} nav-link active" data-images-toggle="all" id="${activeTagId}">${disableFiltersButtonLabel}</button></li>`;
-      tagsSet.forEach(value => tagItems += `<li class="nav-item"><button style="touch-action:manipulation;" class="${options.mauPrefixClass} nav-link" data-images-toggle="${value}">${value}</button></li>`);
+    function showItemTags(gallery) {
+      const tagsPosition = options('tagsPosition');
+      const activeTagId = options('filtersActiveTagId');
+      const disableFiltersButtonLabel = options('disableFiltersButtonLabel');
+      const mauPrefixClass = options('mauPrefixClass');
+      let tagItems = `<li class="nav-item"><button style="touch-action:manipulation;" class="${mauPrefixClass} nav-link active" data-images-toggle="all" id="${activeTagId}">${disableFiltersButtonLabel}</button></li>`;
+      tagsSet().forEach(value => tagItems += `<li class="nav-item"><button style="touch-action:manipulation;" class="${mauPrefixClass} nav-link" data-images-toggle="${value}">${value}</button></li>`);
       const tagsRow = `<ul class="my-4 tags-bar nav nav-pills">${tagItems}</ul>`;
       if (tagsPosition === 'bottom') {
         gallery.innerHTML = gallery.innerHTML + tagsRow;
@@ -333,7 +383,7 @@ function mauGallery(opt = {}) {
       }
     }
 
-    function generateRowWrapper(target, item, options, tagsSet) {
+    function generateRowWrapper(target, item) {
       let tag = null;
       let itemImg = null;
       if (item.tagName === 'IMG') {
@@ -344,84 +394,92 @@ function mauGallery(opt = {}) {
         tag = itemImg.dataset.galleryTag;
         itemImg.classList.add('img-fluid');
       }
-      if (options.showTags && tag) {
-        tagsSet.add(tag);
+      if (options('showTags') && tag) {
+        tagsSet().add(tag);
       }
-      const parent = target.querySelector(`.${options.mauPrefixClass}#${options.galleryItemsRowId}`);
+      const mauPrefixClass = options('mauPrefixClass');
+      const galleryItemsRowId = options('galleryItemsRowId');
+      const parent = target.querySelector(`.${mauPrefixClass}#${galleryItemsRowId}`);
       parent.append(item);
-      wrapItemInColumn(item, options);
+      wrapItemInColumn(item);
     }
 
-    function generateListeners(gallery, modal, options) {
+    function generateListeners(gallery, modal) {
       function handleKeyDown(event) {
         if (event.keyCode == 37 || event.key === 'ArrowLeft') {
-          prevImage(modal, options);
-          const mgPrevElement = modal.querySelector(`button.${options.mauPrefixClass}.mg-prev`);
+          prevImage(modal);
+          const mauPrefixClass = options('mauPrefixClass');
+          const mgPrevElement = modal.querySelector(`button.${mauPrefixClass}.mg-prev`);
           mgPrevElement.focus();
         }
         if (event.keyCode == 39 || event.key === 'ArrowRight') {
-          nextImage(modal, options);
-          const mgNextElement = modal.querySelector(`button.${options.mauPrefixClass}.mg-next`);
+          nextImage(modal);
+          const mauPrefixClass = options('mauPrefixClass');
+          const mgNextElement = modal.querySelector(`button.${mauPrefixClass}.mg-next`);
           mgNextElement.focus();
         }
       }
 
-      elements = gallery.querySelectorAll(`.${options.mauPrefixClass}.${options.modalTriggerClass}`);
+      const mauPrefixClass = options('mauPrefixClass');
+      const modalTriggerClass = options('modalTriggerClass');
+      elements = gallery.querySelectorAll(`.${mauPrefixClass}.${modalTriggerClass}`);
       document.addEventListener('keydown', (event) => {
         if (event.keyCode == 9 || event.key === 'Tab') {
-          memoTab = true;
-          if (memoTabTimeout) {
-            clearTimeout(memoTabTimeout);
+          memos('tab', true);
+          if (memos('tabTimeout')) {
+            clearTimeout(memos('tabTimeout'));
+            memos('tabTimeout', null);
           }
-          memoTabTimeout = setTimeout(() => {
-            memoTab = false
-            memoTabTimeout = null;
-          }, 850);
+          memos('tabTimeout', setTimeout(() => {
+            memos('tab', false);
+            memos('tabTimeout', null);
+          }, 850));
         }
       })
       elements.forEach(element => {
         element.addEventListener('click', (event) => {
-          if (!memoTab) {
+          if (!memos('tab')) {
             saveCurrentCameraPosition();
           } else {
-            memoCurX = -1;
+            memos('curX', -1);
           }
           let imgElement = event.target.querySelector('img') ?? event.target;
-          if (options.lightBox && imgElement) {
+          if (options('lightBox') && imgElement) {
             if (imgElement.parentNode.tagName === 'PICTURE') {
               imgElement = imgElement.parentNode;
             }
-            lightBoxOnOpen(modal, imgElement, options);
+            lightBoxOnOpen(modal, imgElement);
           }
         });
       });
 
-      const galleryElementNavLinks = gallery.querySelectorAll(`.${options.mauPrefixClass}.nav-link`);
-      const galleryElementMgPrev = gallery.querySelector(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.mg-prev`);
-      const galleryElementMgNext = gallery.querySelector(`#${options.galleryRootNodeId} .${options.mauPrefixClass}.mg-next`);
+      const galleryRootNodeId = options('galleryRootNodeId');
+      const galleryElementNavLinks = gallery.querySelectorAll(`.${mauPrefixClass}.nav-link`);
+      const galleryElementMgPrev = gallery.querySelector(`#${galleryRootNodeId} .${mauPrefixClass}.mg-prev`);
+      const galleryElementMgNext = gallery.querySelector(`#${galleryRootNodeId} .${mauPrefixClass}.mg-next`);
 
-      galleryElementNavLinks.forEach(navlink => navlink.addEventListener('click', (event) => filterByTag(event.target, options)));
-      galleryElementMgPrev.addEventListener('click', () => prevImage(modal, options));
-      galleryElementMgNext.addEventListener('click', () => nextImage(modal, options));
+      galleryElementNavLinks.forEach(navlink => navlink.addEventListener('click', (event) => filterByTag(event.target)));
+      galleryElementMgPrev.addEventListener('click', () => prevImage(modal));
+      galleryElementMgNext.addEventListener('click', () => nextImage(modal));
 
       modal.addEventListener('shown.bs.modal', () => {
         document.addEventListener('keydown', handleKeyDown);
       });
 
       modal.addEventListener('hidden.bs.modal', () => {
-        if (options.navigation) {
+        if (options('navigation')) {
           const buttons = modal.querySelectorAll('button');
           buttons.forEach(button => button.removeAttribute('tabindex'));
         }
         snapCameraToSavedPosition();
         document.removeEventListener('keydown', handleKeyDown);
-        const oldCurrentModalImg = modal.querySelector(`#${options.lightboxImgId}`);
-        setImgToOff(oldCurrentModalImg);
+        const oldCurrentModalImg = getCurrentModalImage(modal);
+        setGalleryImgToOff(oldCurrentModalImg);
         oldCurrentModalImg.removeAttribute('id');
       });
     }
 
-    function lightBoxOnOpen(modal, element, options) {
+    function lightBoxOnOpen(modal, element) {
       let providedImg = element;
       if (element.tagName === 'PICTURE') {
         providedImg = element.querySelector('img');
@@ -429,37 +487,36 @@ function mauGallery(opt = {}) {
       const modalImgs = modal.querySelectorAll('img');
       for (const modalImg of modalImgs) {
         if (modalImg.getAttribute('src') === providedImg.getAttribute('src')) {
-          modalImg.id = options.lightboxImgId;
-          setImgToOn(modalImg);
+          modalImg.id = options('lightboxImgId');
+          setGalleryImgToOn(modalImg);
           break;
         }
       }
 
-      if (options.navigation) {
+      if (options('navigation')) {
         const buttons = modal.querySelectorAll('button');
         buttons.forEach(button => button.setAttribute('tabindex', 0));
       }
     }
 
-    function createLightBox(gallery, options) {
-      const lightboxId = options.lightboxId;
-      const navigation = options.navigation;
-      const prevImgBtnLabel = options.prevImgButtonLabel;
-      const nextImgBtnLabel = options.nextImgButtonLabel;
-      const mauPrefixClass = options.mauPrefixClass;
+    function createLightBox(gallery) {
+      const lightboxId = options('lightboxId');
+      const navigation = options('navigation');
+      const prevImgBtnLabel = options('prevImgButtonLabel');
+      const nextImgBtnLabel = options('nextImgButtonLabel');
+      const mauPrefixClass = options('mauPrefixClass');
       const whitelist = ['src', 'alt', 'srcset', 'sizes', 'data-gallery-tag'];
 
       let allOuterHTML = '';
-      memoRichGalleryItems.forEach(galleryItem => {
+      memos('richGalleryItems').forEach(galleryItem => {
         let currentElement = null;
         if (galleryItem.picture) {
           currentElement = galleryItem.picture.cloneNode(deep = true);
-          initializeModalImg(currentElement.querySelector('img'), whitelist, options);
         } else if (galleryItem.item.tagName === 'IMG') {
           currentElement = galleryItem.item.cloneNode(deep = true);
-          initializeModalImg(currentElement, whitelist, options);
         }
         if (currentElement) {
+          initializeModalImg(currentElement, whitelist);
           currentElement.style.display = 'none';
           allOuterHTML += currentElement.outerHTML;
         }
@@ -479,88 +536,123 @@ function mauGallery(opt = {}) {
       gallery.innerHTML = gallery.innerHTML + lightbox;
     }
 
-    function createRowWrapper(element, options) {
+    function createRowWrapper(element) {
       if (!element.classList.contains('row')) {
         const div = document.createElement('div');
-        div.id = options.galleryItemsRowId;
-        div.classList.add(options.mauPrefixClass, 'row');
+        div.id = options('galleryItemsRowId');
+        div.classList.add(options('mauPrefixClass'), 'row');
         element.append(div);
       }
     }
 
-    function appendCSS(options) {
-      const animationKeyframesRepresentation = `@keyframes ${options.styles.animation.gallery.animationName} ${options.styles.animation.gallery.animationKeyframes}`;
-      const animationRuleValue = `${options.styles.animation.gallery.animationName} ${options.styles.animation.gallery.animationDurationOnFilter} ${options.styles.animation.gallery.animationEasing}`;
-      const modalAnimationRuleValue = `${options.styles.animation.gallery.animationName} ${options.styles.animation.gallery.animationDurationOnModalAppear} ${options.styles.animation.gallery.animationEasing}`;
-      const dispatchAnimOnGallery = `.${options.mauPrefixClass}#${options.galleryItemsRowId} {animation: ${animationRuleValue}}`;
-      const dispatchAnimOnModal = `.${options.mauPrefixClass}.modal {animation: ${modalAnimationRuleValue}}`;
+    function appendCSS() {
+      const optionsStyles = props.options.styles;
+      function animationStyleProperty(animationCategory, key) {
+        return optionsStyles.animation[animationCategory][key];
+      }
 
-      const fontSize = options.styles.modal.navigation.fontSize ?? `calc(${options.styles.modal.navigation.arrowBoxesSize} / 2)`;
-      const navigationButtonsRule = `
-        .${options.mauPrefixClass}.mg-next, .${options.mauPrefixClass}.mg-prev {
-        display:block;position:absolute;
-        bottom:calc(50% - calc(${options.styles.modal.navigation.arrowBoxesSize} / 2));
-        width:${options.styles.modal.navigation.arrowBoxesSize};
-        height:${options.styles.modal.navigation.arrowBoxesSize};
-        border-radius:0;font-size:${fontSize};
-        transition: left ${options.styles.animation.modal.arrowTransitionDelay}, right ${options.styles.animation.modal.arrowTransitionDelay};}`;
-      const navigationLeftRules = `
-        .${options.mauPrefixClass}.mg-prev {
-        --_delta: calc(${options.styles.modal.navigation.arrowBoxesSize} * .1);
-        --_negative-value: -${options.styles.modal.navigation.arrowBoxesSize};
-        --_left: calc(var(--_negative-value) + var(--_delta));
-        left: var(--_left);}`;
-      const navigationRightRules = `
-        .${options.mauPrefixClass}.mg-next {
-        --_delta: calc(${options.styles.modal.navigation.arrowBoxesSize} * .1);
-        --_negative-value: -${options.styles.modal.navigation.arrowBoxesSize};
-        --_right: calc(var(--_negative-value) + var(--_delta));
-        right: var(--_right)}`;
+      const arrowTransitionDelay = animationStyleProperty('modal', 'arrowTransitionDelay');
 
-      const navigationButtonsResponsiveRule = `@media (max-width: 1000px) {.mau.mg-next, .mau.mg-prev {
-        left: calc(var(--_left) / 12); right: calc(var(--_right) / 12); margin:0 calc(${options.styles.modal.navigation.arrowBoxesSize} * .1);}
-        transition: left ${options.styles.animation.modal.arrowTransitionDelay}, right ${options.styles.animation.modal.arrowTransitionDelay};}`;
+      const animationName = animationStyleProperty('gallery', 'animationName');
+      const animationKeyframes = animationStyleProperty('gallery', 'animationKeyframes');
+      const animationDurationOnFilter = animationStyleProperty('gallery', 'animationDurationOnFilter');
+      const animationEasing = animationStyleProperty('gallery', 'animationEasing');
+      const animationDurationOnModalAppear = animationStyleProperty('gallery', 'animationDurationOnModalAppear');
 
-      style.sheet.insertRule(animationKeyframesRepresentation, 0);
-      style.sheet.insertRule(dispatchAnimOnGallery, 0);
-      style.sheet.insertRule(dispatchAnimOnModal, 0);
-      style.sheet.insertRule(navigationButtonsResponsiveRule, 0);
-      style.sheet.insertRule(navigationButtonsRule, 0);
-      style.sheet.insertRule(navigationRightRules, 0);
-      style.sheet.insertRule(navigationLeftRules, 0);
+      const mauPrefixClass = options('mauPrefixClass');
+      const galleryItemsRowId = options('galleryItemsRowId');
+
+      const modalNavigation = optionsStyles.modal.navigation;
+      const modalNavigationFontSize = modalNavigation['fontSize'];
+      const modalArrowBoxesSize = modalNavigation['arrowBoxesSize'];
+
+      const animationRuleValue = `${animationName} ${animationDurationOnFilter} ${animationEasing}`;
+      const modalAnimationRuleValue = `${animationName} ${animationDurationOnModalAppear} ${animationEasing}`;
+
+      const fontSize = modalNavigationFontSize ?? `calc(${modalArrowBoxesSize} / 2)`;
+
+      const rules = {
+        'animationKeyframes': `@keyframes ${animationName} ${animationKeyframes}`,
+        'galleryAnimation': `
+          .${mauPrefixClass}#${galleryItemsRowId} {
+          animation: ${animationRuleValue}
+        }`,
+        'modalAnimation': `
+          .${mauPrefixClass}.modal {
+            animation: ${modalAnimationRuleValue}
+          }`,
+        'navigationButtons': `
+          .${mauPrefixClass}.mg-next, .${mauPrefixClass}.mg-prev {
+            display: block;
+            position: absolute;
+            bottom: calc(50% - calc(${modalArrowBoxesSize} / 2));
+            width: ${modalArrowBoxesSize};
+            height: ${modalArrowBoxesSize};
+            border-radius: 0;
+            font-size: ${fontSize};
+            transition: left ${arrowTransitionDelay}, right ${arrowTransitionDelay};
+          }`,
+        'navigationButtonRight': `
+          .${mauPrefixClass}.mg-next {
+            --_delta: calc(${modalArrowBoxesSize} * .1);
+            --_negative-value: -${modalArrowBoxesSize};
+            --_right: calc(var(--_negative-value) + var(--_delta));
+            right: var(--_right)
+          }`,
+        'navigationButtonLeft': `
+          .${mauPrefixClass}.mg-prev {
+            --_delta: calc(${modalArrowBoxesSize} * .1);
+            --_negative-value: -${modalArrowBoxesSize};
+            --_left: calc(var(--_negative-value) + var(--_delta));
+            left: var(--_left);
+          }`,
+        'navigationButtonsResponsive': `
+          @media (max-width: 1000px) {
+            .mau.mg-next, .mau.mg-prev {
+              left: calc(var(--_left) / 12);
+              right: calc(var(--_right) / 12);
+              margin: 0 calc(${modalArrowBoxesSize} * .1);
+              transition: left ${arrowTransitionDelay}, right ${arrowTransitionDelay};
+            }
+          }`
+      };
+      Object.keys(rules).reverse().forEach(key => style.sheet.insertRule(rules[key].replace(/ +/g, ' '), 0));
     }
 
-    function process(target, options) {
-      appendCSS(options);
-      createRowWrapper(target, options);
+    function process() {
+      const galleryRootNodeId = options('galleryRootNodeId');
+      const mauPrefixClass = options('mauPrefixClass');
+      const galleryItemClass = options('galleryItemClass');
+      const lightBox = options('lightBox');
+      const lightboxId = options('lightboxId');
+      const target = document.querySelector(`#${galleryRootNodeId}`);
+      appendCSS();
+      createRowWrapper(target);
 
-      target.querySelectorAll(`.${options.mauPrefixClass}.${options.galleryItemClass}`).forEach(item => {
+      target.querySelectorAll(`.${mauPrefixClass}.${galleryItemClass}`).forEach(item => {
         if (item.parentNode.tagName === 'PICTURE') {
           item = item.parentNode;
         }
-        generateRowWrapper(target, item, options, tagsSet)
+        generateRowWrapper(target, item);
       });
-      getRichGalleryItems(options);
-      if (options.lightBox) {
-        createLightBox(target, options);
+      getRichGalleryItems();
+      if (lightBox) {
+        createLightBox(target);
       }
 
-      if (options.showTags) {
-        showItemTags(target, options, tagsSet);
+      if (options('showTags')) {
+        showItemTags(target);
       }
-      const modal = document.querySelector(`.${options.mauPrefixClass}#${options.lightboxId}`);
-      generateListeners(target, modal, options);
+      const modal = document.querySelector(`.${mauPrefixClass}#${lightboxId}`);
+      generateListeners(target, modal);
     }
 
-    process(target, options);
+    process();
   }
 
   function run(opt) {
-    const options = mauGallerydefaults;
-    Object.assign(options, opt);
-
-    const target = document.querySelector(`#${options.galleryRootNodeId}`);
-    injectMau(target, options);
+    Object.assign(props.options, opt);
+    injectMau(props);
   }
 
   run(opt);
