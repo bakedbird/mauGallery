@@ -31,7 +31,7 @@ function mauGallery(opt = {}) {
       },
       'modal': {
         'navigation': {
-          'arrowBoxesSize': {size: '50', unit: 'px'},
+          'arrowBoxesSizeObj': { size: '50', unit: 'px' },
           'forcedFontSize': null
         }
       }
@@ -47,8 +47,15 @@ function mauGallery(opt = {}) {
 
   const props = {
     'memos': {
+      'shownModal': false,
+      'touchstartX': null,
+      'touchendX': null,
+      'touchstartY': null,
+      'touchendY': null,
       'curX': 0,
       'curY': 0,
+      'activeElement': null,
+      'activeElementAbsoluteY': null,
       'scrollBehavior': null,
       'isOnMobile': null,
       'richGalleryItems': null,
@@ -66,17 +73,22 @@ function mauGallery(opt = {}) {
     return props.tagsSet;
   }
 
-  function options(key) {
-    const obj = props.options;
-    if (!(key in obj)) {
+  function options(key = undefined) {
+    if (key === undefined) {
+      return props.options;
+    }
+    if (!(key in props.options)) {
       throw new Error(`No option value found with this key: ${key}`);
     }
 
-    const value = obj[key];
+    const value = props.options[key];
     return value;
   }
 
-  function memos(key, newValue = undefined) {
+  function memos(key = undefined, newValue = undefined) {
+    if (key === undefined) {
+      return props.memos;
+    }
     if (!(key in props.memos)) {
       throw new Error(`No memo value found with this key: ${key}`);
     }
@@ -89,25 +101,41 @@ function mauGallery(opt = {}) {
     return value;
   }
 
+  function getModalElement() {
+    const mauPrefixClass = options('mauPrefixClass');
+    const lightboxId = options('lightboxId');
+    const modal = document.querySelector(`.${mauPrefixClass}#${lightboxId}`);
+    return modal;
+  }
+
   function injectMau(props) {
     function isOnMobile() {
       if (memos('isOnMobile') === null) {
-        memos('isOnMobile', (navigator.userAgent.match(/Android/i)
-          || navigator.userAgent.match(/webOS/i)
-          || navigator.userAgent.match(/iPhone/i)
-          || navigator.userAgent.match(/iPad/i)
-          || navigator.userAgent.match(/iPod/i)
-          || navigator.userAgent.match(/BlackBerry/i)
-          || navigator.userAgent.match(/Windows Phone/i)) === true);
+        const userAgent = navigator.userAgent.toLowerCase();
+        memos('isOnMobile', userAgent.match(/(ipad)|(iphone)|(ipod)|(android)|(webos)|(blackberry)|(tablet)|(kindle)|(playbook)|(silk)|(windows phone)/i));
       }
       return memos('isOnMobile');
     }
 
-    function saveCurrentCameraPosition() {
-      memos('scrollBehavior', document.documentElement.style.scrollBehavior);
-      document.documentElement.style.scrollBehavior = 'smooth !important;'
-      memos('curX', window.scrollX);
-      memos('curY', window.scrollY);
+    function getAbsoluteElementY(element) {
+      const bodyRect = document.body.getBoundingClientRect();
+      const elementRect = element.getBoundingClientRect();
+      const offset = elementRect.top - bodyRect.top;
+      return offset;
+    }
+
+    function isInViewport(element) {
+      const height = parseInt(window.getComputedStyle(element).height, 10) - 1;
+      const width = parseInt(window.getComputedStyle(element).width, 10) - 1;
+      const rect = element.getBoundingClientRect();
+      const computedUpPx = rect.bottom - height;
+      const computedLeftPx = rect.right - width;
+      return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        (computedUpPx <= window.innerHeight && computedLeftPx <= window.innerWidth) ||
+        (rect.bottom <= window.innerHeight && rect.right <= window.innerWidth)
+      );
     }
 
     function clearSaveCurrentCameraPositionSideEffects() {
@@ -115,24 +143,66 @@ function mauGallery(opt = {}) {
     }
 
     function snapCamera(x, y, delay = 0) {
+      function doSnapCamera(x, y, delay) {
+        setTimeout(() => {
+          const oldScrollBehavior = document.documentElement.style.scrollBehavior;
+          document.documentElement.style.scrollBehavior = 'auto !important;'
+          window.scrollTo({
+            top: y,
+            left: x,
+            behavior: 'auto'
+          });
+          document.documentElement.style.scrollBehavior = oldScrollBehavior;
+        }, delay);
+      }
+  
       if (x < 0) {
         return;
       }
-      setTimeout(() => {
-        const oldScrollBehavior = document.documentElement.style.scrollBehavior;
-        document.documentElement.style.scrollBehavior = 'auto !important;'
-        window.scrollTo({
-          top: y,
-          left: x,
-          behavior: 'auto'
-        });
-        document.documentElement.style.scrollBehavior = oldScrollBehavior;
-      }, delay);
+      for (let i = 0; i < 25; i++) {
+        doSnapCamera(x, y, delay + i);
+      }
     }
 
-    function snapCameraToSavedPosition(delay = 0) {
-      for (let i = 0; i < 25; i++) {
-        snapCamera(memos('curX'), memos('curY'), delay + i);
+    function saveCurrentCameraPosition() {
+      memos('scrollBehavior', document.documentElement.style.scrollBehavior);
+      memos('curX', window.scrollX);
+      memos('curY', window.scrollY);
+      const activeElement = document.activeElement;
+      if (activeElement) {
+        memos('activeElement', activeElement);
+        memos('activeElementAbsoluteY', getAbsoluteElementY(activeElement));
+      }
+      document.documentElement.style.scrollBehavior = 'smooth !important;'
+    }
+
+    function moveCameraToSavedPosition(activeElement = null) {
+      function scrollToActiveElement(activeElement, currentY, oldY) {
+        const activeElementOldPaddingTop = activeElement.style.paddingTop;
+        const activeElementOldPaddingBottom = activeElement.style.paddingBottom;
+        if (currentY > oldY) {
+          activeElement.style.paddingBottom = '15px';
+          activeElement.scrollIntoView(false);
+        } else {
+          activeElement.style.paddingTop = '15px';
+          activeElement.scrollIntoView(true);
+        }
+        activeElement.style.paddingTop = activeElementOldPaddingTop;
+        activeElement.style.paddingBottom = activeElementOldPaddingBottom;
+      }
+
+      if (activeElement) {
+        const currentY = getAbsoluteElementY(activeElement);
+        const oldY = memos('activeElementAbsoluteY');
+        const distance = Math.abs(oldY - currentY);
+        const computedElementHeight = parseInt(window.getComputedStyle(activeElement).height, 10);
+        if (!isInViewport(activeElement) || distance >= computedElementHeight) {
+          scrollToActiveElement(activeElement, currentY, oldY);
+        } else {
+          snapCamera(memos('curX'), memos('curY'));
+        }
+      } else {
+        snapCamera(memos('curX'), memos('curY'));
       }
       clearSaveCurrentCameraPositionSideEffects();
     }
@@ -144,29 +214,26 @@ function mauGallery(opt = {}) {
         element.outerHTML = newHtml;
       }
 
+      const lightBox = options('lightBox');
       const columns = options('columns');
       const mauPrefixClass = options('mauPrefixClass');
       const lightboxId = options('lightboxId');
       const modalTriggerClass = options('modalTriggerClass');
-      const galleryRootNodeId = options('galleryRootNodeId');
       const isImg = element.tagName === 'IMG' || element.tagName === 'PICTURE';
-      const injectModalTrigger = `data-bs-toggle="modal" data-bs-target=".${mauPrefixClass}#${lightboxId}" class="${mauPrefixClass} ${modalTriggerClass}"`;
+      const injectModalTrigger = lightBox ? `data-bs-toggle="modal" data-bs-target=".${mauPrefixClass}#${lightboxId}" class="${mauPrefixClass} ${modalTriggerClass}"` : '';
       let wrapperOpen = '';
       let wrapperClose = '';
-      if (isOnMobile()) {
-        style.sheet.insertRule(`#${galleryRootNodeId} .${mauPrefixClass}.item-column a:focus {outline-style:none;box-shadow:none;border-color:transparent;}`, 0);
-      }
       if (typeof columns === 'number') {
-        if (isImg) {
+        if (isImg && lightBox) {
           wrapperOpen = `<div class='${mauPrefixClass} item-column mb-4 col-${Math.ceil(12 / columns)}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
           wrapperClose = '</a></div>';
         } else {
-          wrapperOpen = `<div tabindex="0" class='${mauPrefixClass} item-column mb-4 col-${Math.ceil(12 / columns)}'><div style="width:100%;height:100%;">`;
+          wrapperOpen = `<div class='${mauPrefixClass} item-column mb-4 col-${Math.ceil(12 / columns)}'><div tabindex="0" style="width:100%;height:100%;">`;
           wrapperClose = '</div></div>';
         }
         doWrap(element, wrapperOpen, wrapperClose);
       } else if (typeof columns === 'object') {
-        const columnsObjSchema = {'xs': '', 'sm': '', 'md': '', 'lg': '', 'xl': ''}
+        const columnsObjSchema = { 'xs': '', 'sm': '', 'md': '', 'lg': '', 'xl': '' }
         Object.keys(columns).forEach(key => {
           if (!(key in columnsObjSchema)) {
             throw new Error(`Unknown columns key: ${key}.`);
@@ -188,11 +255,11 @@ function mauGallery(opt = {}) {
         if (columns.xl) {
           columnClasses += ` col-xl-${Math.ceil(12 / columns.xl)}`;
         }
-        if (isImg) {
+        if (isImg && lightBox) {
           wrapperOpen = `<div class='${mauPrefixClass} item-column mb-4${columnClasses}'><a href="#" ${injectModalTrigger} style="text-decoration:none;color:inherit;display:flex;width:100%;height:100%">`;
           wrapperClose = '</a></div>';
         } else {
-          wrapperOpen = `<div tabindex="0" class='${mauPrefixClass} item-column mb-4${columnClasses}'><div style="width:100%;height:100%;">`;
+          wrapperOpen = `<div class='${mauPrefixClass} item-column mb-4${columnClasses}'><div tabindex="0" style="width:100%;height:100%;">`;
           wrapperClose = '</div></div>';
         }
         doWrap(element, wrapperOpen, wrapperClose);
@@ -241,12 +308,15 @@ function mauGallery(opt = {}) {
       if (sizes) {
         element.setAttribute('sizes', sizes);
       }
+      if (!isOnMobile()) {
+        element.style.maxHeight = '85vh';
+      }
     }
 
     function buildImagesCollection(modal) {
       const mauPrefixClass = options('mauPrefixClass');
       const filtersActiveTagId = options('filtersActiveTagId');
-      const activeTag = document.querySelector(`.${mauPrefixClass}#${filtersActiveTagId}`).dataset.imagesToggle;
+      const activeTag = !options('showTags') ? 'all' : document.querySelector(`.${mauPrefixClass}#${filtersActiveTagId}`).dataset.imagesToggle;
       const attributeFilter = activeTag === 'all' ? '' : `[data-gallery-tag="${activeTag}"]`;
       const galleryItems = modal.querySelectorAll(`img.${mauPrefixClass}${attributeFilter}`);
 
@@ -257,15 +327,87 @@ function mauGallery(opt = {}) {
       return modal.querySelector(`#${options('lightboxImgId')}`);
     }
 
+    function getMgElements(modal) {
+      const lightboxId = options('lightboxId');
+      const mgElements = {
+        'mgPrev': modal.querySelector(`#${lightboxId} .mg-prev`),
+        'mgNext': modal.querySelector(`#${lightboxId} .mg-next`)
+      }
+      return mgElements;
+    }
+
+    function expandModalNavigationArrows(modal) {
+      const mgElements = getMgElements(modal);
+
+      Object.keys(mgElements).forEach(key => {
+        mgElements[key].style.left = null;
+        mgElements[key].style.right = null;
+        mgElements[key].style.margin = null;
+      });
+    }
+
+    function collapseModalNavigationArrows(modal) {
+      const mgElements = getMgElements(modal);
+
+      Object.keys(mgElements).forEach(key => {
+        mgElements[key].style.left = 'calc(var(--_left) / 12)';
+        mgElements[key].style.right = 'calc(var(--_right) / 12)';
+        mgElements[key].style.margin = '0 calc(var(--_delta) / 2)';
+      });
+    }
+
+    function computeModalNavigationArrowsPosition(modal, newModalDialogMaxWidth) {
+      if (!options('navigation')) {
+        return;
+      }
+
+      if (isOnMobile()) {
+        collapseModalNavigationArrows(modal);
+        return;
+      }
+
+      const delta = props.options.styles.modal.navigation.arrowBoxesSizeObj.size * 1.5;
+      if (window.innerWidth - delta < parseInt(newModalDialogMaxWidth, 10)) {
+        collapseModalNavigationArrows(modal);
+      } else {
+        expandModalNavigationArrows(modal);
+      }
+    }
+
+    function updateModalSize(modal) {
+      if (isOnMobile()) {
+        collapseModalNavigationArrows(modal);
+        return;
+      }
+
+      const currentWidth = window.innerWidth;
+      const modalDialog = modal.querySelector('.modal-dialog');
+      if (currentWidth < 576) {
+        modalDialog.style.maxWidth = null;
+        return;
+      }
+      const imgElement = getCurrentModalImage(modal);
+      modalDialog.style.maxWidth = '100vw';
+      const newImgWidth = window.getComputedStyle(imgElement).width;
+      const newModalDialogMaxWidth = newImgWidth;
+      modalDialog.style.maxWidth = newModalDialogMaxWidth;
+      computeModalNavigationArrowsPosition(modal, newModalDialogMaxWidth);
+    }
+
     function updateModalImg(modal, newModalImg) {
       const oldModalImg = getCurrentModalImage(modal);
       setGalleryImgToOn(newModalImg);
       setGalleryImgToOff(oldModalImg);
       oldModalImg.removeAttribute('id');
       newModalImg.id = options('lightboxImgId');
+      updateModalSize(modal);
     }
 
     function prevImage(modal) {
+      if (!options('navigation')) {
+        return;
+      }
+
       const imagesCollection = buildImagesCollection(modal);
       const activeImage = getCurrentModalImage(modal);
 
@@ -284,6 +426,10 @@ function mauGallery(opt = {}) {
     }
 
     function nextImage(modal) {
+      if (!options('navigation')) {
+        return;
+      }
+
       const imagesCollection = buildImagesCollection(modal);
       const activeImage = getCurrentModalImage(modal);
 
@@ -354,6 +500,11 @@ function mauGallery(opt = {}) {
       activeTag.removeAttribute('id');
       element.classList.add(mauPrefixClass, 'active');
       element.id = filtersActiveTagId;
+      let activeElementOldTop = null;
+
+      if (options("tagsPosition") === 'bottom') {
+        activeElementOldTop = document.activeElement.getBoundingClientRect().top;
+      }
 
       richGalleryItems.forEach(richItem => {
         if (tag === 'all' || richItem.item.dataset.galleryTag === tag) {
@@ -361,8 +512,22 @@ function mauGallery(opt = {}) {
         } else {
           richItem.column.style.display = 'none';
         }
-        snapCameraToSavedPosition();
+        if (options("tagsPosition") === 'top') {
+          moveCameraToSavedPosition();
+        }
       });
+
+      if (options("tagsPosition") === 'bottom') {
+        const activeElementTop = document.activeElement.getBoundingClientRect().top;
+        const activeElementTopsDistance = Math.abs(activeElementOldTop - activeElementTop);
+        if (activeElementTopsDistance >= 100) {
+          const oldPaddingBottom = document.activeElement.style.paddingBottom;
+          document.activeElement.style.paddingBottom = '25px';
+          clearSaveCurrentCameraPositionSideEffects();
+          document.activeElement.scrollIntoView(false);
+          document.activeElement.style.paddingBottom = oldPaddingBottom;
+        }
+      }
     }
 
     function showItemTags(gallery) {
@@ -403,26 +568,47 @@ function mauGallery(opt = {}) {
       wrapItemInColumn(item);
     }
 
-    function generateListeners(gallery, modal) {
-      function handleKeyDown(event) {
-        if (event.keyCode == 37 || event.key === 'ArrowLeft') {
-          prevImage(modal);
-          const mauPrefixClass = options('mauPrefixClass');
-          const mgPrevElement = modal.querySelector(`button.${mauPrefixClass}.mg-prev`);
-          mgPrevElement.focus();
-        }
-        if (event.keyCode == 39 || event.key === 'ArrowRight') {
-          nextImage(modal);
-          const mauPrefixClass = options('mauPrefixClass');
-          const mgNextElement = modal.querySelector(`button.${mauPrefixClass}.mg-next`);
-          mgNextElement.focus();
-        }
-      }
+    function initializeModalSize() {
+      const modal = getModalElement();
+      updateModalSize(modal);
+      const modalBackDrop = document.querySelector('.modal-backdrop');
+      modalBackDrop.removeEventListener('transitionend', initializeModalSize);
+    }
 
+    function generateListeners(gallery, modal) {
       const mauPrefixClass = options('mauPrefixClass');
+      const galleryRootNodeId = options('galleryRootNodeId');
+      const galleryElementNavLinks = gallery.querySelectorAll(`#${galleryRootNodeId} .tags-bar .${mauPrefixClass}.nav-link`);
+      galleryElementNavLinks.forEach(navlink => navlink.addEventListener('click', event => filterByTag(event.target)));
+
+      if (!options('lightBox')) {
+        return;
+      }
+      modal.addEventListener('shown.bs.modal', () => {
+        document.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('resize', handleResize);
+        memos('shownModal', true);
+      });
+
+      modal.addEventListener('hidden.bs.modal', () => {
+        if (options('navigation')) {
+          const buttons = modal.querySelectorAll('button');
+          buttons.forEach(button => button.removeAttribute('tabindex'));
+        }
+        const oldCurrentModalImg = getCurrentModalImage(modal);
+        const activeElement = memos('activeElement')
+
+        moveCameraToSavedPosition(activeElement);
+        document.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('resize', handleResize);
+        setGalleryImgToOff(oldCurrentModalImg);
+        oldCurrentModalImg.removeAttribute('id');
+        memos('shownModal', false);
+      });
+
       const modalTriggerClass = options('modalTriggerClass');
       elements = gallery.querySelectorAll(`.${mauPrefixClass}.${modalTriggerClass}`);
-      document.addEventListener('keydown', (event) => {
+      document.addEventListener('keydown', event => {
         if (event.keyCode == 9 || event.key === 'Tab') {
           memos('tab', true);
           if (memos('tabTimeout')) {
@@ -435,8 +621,10 @@ function mauGallery(opt = {}) {
           }, 850));
         }
       })
+
       elements.forEach(element => {
-        element.addEventListener('click', (event) => {
+        element.addEventListener('click', event => {
+          event.preventDefault();
           if (!memos('tab')) {
             saveCurrentCameraPosition();
           } else {
@@ -452,30 +640,78 @@ function mauGallery(opt = {}) {
         });
       });
 
-      const galleryRootNodeId = options('galleryRootNodeId');
-      const galleryElementNavLinks = gallery.querySelectorAll(`.${mauPrefixClass}.nav-link`);
-      const galleryElementMgPrev = gallery.querySelector(`#${galleryRootNodeId} .${mauPrefixClass}.mg-prev`);
-      const galleryElementMgNext = gallery.querySelector(`#${galleryRootNodeId} .${mauPrefixClass}.mg-next`);
+      if (!options('navigation')) {
+        return;
+      }
 
-      galleryElementNavLinks.forEach(navlink => navlink.addEventListener('click', (event) => filterByTag(event.target)));
+      function handleSwipe() {
+        const ms = [memos('touchendX'), memos('touchendY'), memos('touchstartX'), memos('touchstartY')];
+        if (!memos('shownModal') || ms.some(m => m === null)) {
+          return;
+        }
+        const Xdistance = Math.abs(memos('touchendX') - memos('touchstartX'));
+        if (Xdistance < 30) {
+          return;
+        }
+        const angle = Math.atan2(memos('touchendY') - memos('touchstartY'), memos('touchendX') - memos('touchstartX')) * 180 / Math.PI;
+        if (angle >= -30 && angle <= 30) {
+          const modal = getModalElement();
+          nextImage(modal);
+        }
+        if ((angle >= -179 && angle <= -149) || (angle >= 150 && angle <= 180)) {
+          const modal = getModalElement();
+          prevImage(modal);
+        }
+      }
+
+      if (isOnMobile()) {
+        modal.addEventListener('touchstart', e => {
+          if (e.touches.length !== 1) {
+            memos('touchstartX', null);
+            memos('touchstartY', null);
+            return;
+          }
+          memos('touchstartX', e.changedTouches[0].screenX);
+          memos('touchstartY', e.changedTouches[0].screenY);
+        });
+
+        modal.addEventListener('touchend', e => {
+          memos('touchendX', e.changedTouches[0].screenX);
+          memos('touchendY', e.changedTouches[0].screenY);
+          handleSwipe();
+        });
+      }
+
+      function handleResize() {
+        const modal = getModalElement();
+        updateModalSize(modal);
+      }
+
+      function handleKeyDown(event) {
+        if (event.keyCode == 37 || event.key === 'ArrowLeft') {
+          if (options('navigation')) {
+            prevImage(modal);
+            const lightboxId = options('lightboxId');
+            const mgPrevElement = modal.querySelector(`#${lightboxId} .mg-prev`);
+            mgPrevElement.focus();
+          }
+        }
+        if (event.keyCode == 39 || event.key === 'ArrowRight') {
+          if (options('navigation')) {
+            nextImage(modal);
+            const lightboxId = options('lightboxId');
+            const mgNextElement = modal.querySelector(`#${lightboxId} .mg-next`);
+            mgNextElement.focus();
+          }
+        }
+      }
+
+      const lightboxId = options('lightboxId');
+      const galleryElementMgPrev = gallery.querySelector(`#${lightboxId} .mg-prev`);
+      const galleryElementMgNext = gallery.querySelector(`#${lightboxId} .mg-next`);
+
       galleryElementMgPrev.addEventListener('click', () => prevImage(modal));
       galleryElementMgNext.addEventListener('click', () => nextImage(modal));
-
-      modal.addEventListener('shown.bs.modal', () => {
-        document.addEventListener('keydown', handleKeyDown);
-      });
-
-      modal.addEventListener('hidden.bs.modal', () => {
-        if (options('navigation')) {
-          const buttons = modal.querySelectorAll('button');
-          buttons.forEach(button => button.removeAttribute('tabindex'));
-        }
-        snapCameraToSavedPosition();
-        document.removeEventListener('keydown', handleKeyDown);
-        const oldCurrentModalImg = getCurrentModalImage(modal);
-        setGalleryImgToOff(oldCurrentModalImg);
-        oldCurrentModalImg.removeAttribute('id');
-      });
     }
 
     function lightBoxOnOpen(modal, element) {
@@ -496,6 +732,8 @@ function mauGallery(opt = {}) {
         const buttons = modal.querySelectorAll('button');
         buttons.forEach(button => button.setAttribute('tabindex', 0));
       }
+      const modalBackDrop = document.querySelector('.modal-backdrop');
+      modalBackDrop.addEventListener('transitionend', initializeModalSize);
     }
 
     function createLightBox(gallery) {
@@ -522,15 +760,16 @@ function mauGallery(opt = {}) {
           allOuterHTML += currentElement.outerHTML;
         }
       });
+      const dynamicModalDialogWidth = !isOnMobile() ? 'style="max-width:100vw"' : '';
       const lightbox = `
-        <div class="${mauPrefixClass} modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" tabindex="-1" role="dialog" aria-hidden="true" style="user-select:none;-webkit-user-select:none;">
-          <div class="${mauPrefixClass} modal-dialog modal-dialog-centered" role="document">
-            <div class="${mauPrefixClass} modal-content style="border-width:16px;border-color:#fff">
-              <div class="${mauPrefixClass} modal-body" style="display:flex;align-items:center;justify-content:center;">
+        <div class="${mauPrefixClass} modal fade" id="${lightboxId}" tabindex="-1" role="dialog" aria-hidden="true" style="user-select:none;-webkit-user-select:none;">
+          <div class="modal-dialog modal-dialog-centered" role="document" ${dynamicModalDialogWidth}>
+            <div class="modal-content" style="border-width:16px;border-color:#fff;background-clip:unset;">
+              <div class="modal-body" style="padding:0">
                 ${allOuterHTML}
               </div>
-              ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="${mauPrefixClass} mg-prev" style="touch-action:manipulation;border:none;background:#fff;"><span><</span></button>` : '<span style="display:none;" />'}
-              ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="${mauPrefixClass} mg-next" style="touch-action:manipulation;border:none;background:#fff;"><span>></span></button>` : '<span style="display:none;" />'}
+              ${navigation ? `<button aria-label="${prevImgBtnLabel}" class="mg-prev" style="touch-action:manipulation;border:none;background:#fff;"><span><</span></button>` : '<span style="display:none;" />'}
+              ${navigation ? `<button aria-label="${nextImgBtnLabel}" class="mg-next" style="touch-action:manipulation;border:none;background:#fff;"><span>></span></button>` : '<span style="display:none;" />'}
             </div>
           </div>
         </div>`;
@@ -561,14 +800,15 @@ function mauGallery(opt = {}) {
 
       const modalNavigation = optionsStyles.modal.navigation;
       const modalNavigationFontSize = modalNavigation['forcedFontSize'];
-      const modalArrowBoxesSize = modalNavigation['arrowBoxesSize'].size;
-      const modalArrowBoxesSizeUnit = modalNavigation['arrowBoxesSize'].unit;
-      const modalArrowBoxesSizeHalf = Math.trunc(modalArrowBoxesSize / 2); //
+      const modalArrowBoxesSize = modalNavigation['arrowBoxesSizeObj'].size;
+      const modalArrowBoxesSizeUnit = modalNavigation['arrowBoxesSizeObj'].unit;
+      const modalArrowBoxesSizeHalf = Math.trunc(modalArrowBoxesSize / 2);
 
       const animationRuleValue = `${animationName} ${animationDurationOnFilter} ${animationEasing}`;
       const modalAnimationRuleValue = `${animationName} ${animationDurationOnModalAppear} ${animationEasing}`;
 
       const mauPrefixClass = options('mauPrefixClass');
+      const lightboxId = options('lightboxId');
       const galleryItemsRowId = options('galleryItemsRowId');
       const modalArrowSizeRuleValue = modalArrowBoxesSize + modalArrowBoxesSizeUnit;
       const modalArrowHalfSizeRuleValue = modalArrowBoxesSizeHalf + modalArrowBoxesSizeUnit;
@@ -586,7 +826,7 @@ function mauGallery(opt = {}) {
             animation: ${modalAnimationRuleValue}
           }`,
         'navigationButtons': `
-          .${mauPrefixClass}.mg-next, .${mauPrefixClass}.mg-prev {
+          #${lightboxId} .mg-next, #${lightboxId} .mg-prev {
             display: block;
             position: absolute;
             bottom: calc(50% - ${modalArrowHalfSizeRuleValue});
@@ -597,29 +837,32 @@ function mauGallery(opt = {}) {
             transition: left ${arrowTransitionDelay}, right ${arrowTransitionDelay};
           }`,
         'navigationButtonRight': `
-          .${mauPrefixClass}.mg-next {
+          #${lightboxId} .mg-next {
             --_delta: calc(${modalArrowSizeRuleValue} * .1);
             --_negative-value: -${modalArrowSizeRuleValue};
-            --_right: calc(var(--_negative-value) + var(--_delta));
+            --_right: calc(var(--_negative-value) - var(--_delta));
             right: var(--_right)
           }`,
         'navigationButtonLeft': `
-          .${mauPrefixClass}.mg-prev {
+          #${lightboxId} .mg-prev {
             --_delta: calc(${modalArrowSizeRuleValue} * .1);
             --_negative-value: -${modalArrowSizeRuleValue};
-            --_left: calc(var(--_negative-value) + var(--_delta));
+            --_left: calc(var(--_negative-value) - var(--_delta));
             left: var(--_left);
-          }`,
-        'navigationButtonsResponsive': `
-          @media (max-width: 1000px) {
-            .mau.mg-next, .mau.mg-prev {
-              left: calc(var(--_left) / 12);
-              right: calc(var(--_right) / 12);
-              margin: 0 var(--_delta);
-              transition: left ${arrowTransitionDelay}, right ${arrowTransitionDelay};
-            }
           }`
       };
+      if (isOnMobile()) {
+        const galleryRootNodeId = options('galleryRootNodeId');
+        const mobileRules = {
+          'disableFocusOutlineOnGalleryImages': `
+            #${galleryRootNodeId} .${mauPrefixClass}.item-column a:focus {
+              outline-style: none;
+              box-shadow: none;
+              border-color: transparent;
+            }`
+        }
+        Object.assign(rules, mobileRules);
+      }
       Object.keys(rules).reverse().forEach(key => style.sheet.insertRule(rules[key].replace(/ +/g, ' '), 0));
     }
 
@@ -628,7 +871,6 @@ function mauGallery(opt = {}) {
       const mauPrefixClass = options('mauPrefixClass');
       const galleryItemClass = options('galleryItemClass');
       const lightBox = options('lightBox');
-      const lightboxId = options('lightboxId');
       const target = document.querySelector(`#${galleryRootNodeId}`);
       appendCSS();
       createRowWrapper(target);
@@ -647,7 +889,7 @@ function mauGallery(opt = {}) {
       if (options('showTags')) {
         showItemTags(target);
       }
-      const modal = document.querySelector(`.${mauPrefixClass}#${lightboxId}`);
+      const modal = getModalElement();
       generateListeners(target, modal);
     }
 
@@ -655,7 +897,8 @@ function mauGallery(opt = {}) {
   }
 
   function run(opt) {
-    Object.assign(props.options, opt);
+    Object.assign(options(), opt);
+    Object.freeze(options());
     injectMau(props);
   }
 
