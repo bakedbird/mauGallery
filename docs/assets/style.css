@@ -1,5 +1,177 @@
-.mau#active-tag {
+@keyframes delayedFadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.mau.nav-link,
+.mau.nav-link:hover {
+  color: #d1cdc7;
+  transition: background-color .4s;
+}
+
+.nav-pills .mau.nav-link {
+  border-width: 2px;
+  border-style: solid;
+  border-color: transparent;
+}
+
+.nav-pills .mau.nav-link.active {
   color: #fff;
-  background-color: #363066;
-  border-radius: 0
+  background-color: black;
+  border-radius: 4px;
+  background-image: linear-gradient(hsla(0, 0%, 100%, .2), hsla(0, 0%, 100%, 0) 30%,
+      hsla(0, 0%, 0%, .3) 50%, hsla(0, 0%, 100%, .1));
+  text-shadow:
+    0 0 15px hsla(0, 0%, 100%, 1),
+    0 2px 4px hsla(0, 0%, 0%, .5);
+  border-image: linear-gradient(to bottom, rgb(var(--bs-light-rgb)), rgb(var(--bs-secondary-rgb))) 1;
+  transition: background-color 1.7s;
+}
+
+.mau.gallery-placeholder {
+  animation: delayedFadeIn 2s;
+}
+
+/*----------------------*/
+/*         MISC         */
+/*----------------------*/
+
+:root {
+  --navbar-height: 65px;
+  --carousel-btns-bg-color: rgba(0, 0, 0, .20)
+}
+
+#carouselMauGallery img {
+  object-fit: cover;
+}
+
+#carouselMauGallery .carousel-inner {
+  --_computed_height: calc(100vh - var(--navbar-height));
+  min-height: var(--_computed_height);
+  height: var(--_computed_height);
+  width: auto;
+  min-width: auto;
+  transition: height .5s
+}
+
+#carouselMauGallery .carousel-control-next-icon,
+#carouselMauGallery .carousel-control-prev-icon {
+  padding: 15px;
+  border-radius: 25px;
+  background-color: var(--carousel-btns-bg-color);
+  filter: drop-shadow(0 0 .5rem rgba(0, 0, 0, .6));
+  border: .4rem solid transparent
+}
+
+#carouselMauGallery .carousel-indicators-container {
+  background-color: var(--carousel-btns-bg-color);
+  border-radius: 100%
+}
+
+#carouselMauGallery .carousel-control-next .carousel-control-next-icon,
+#carouselMauGallery .carousel-control-prev .carousel-control-prev-icon {
+  transition: all .25s ease-in
+}
+
+#carouselMauGallery .carousel-control-next:focus-within .carousel-control-next-icon,
+#carouselMauGallery .carousel-control-prev:focus-within .carousel-control-prev-icon {
+  transform: scale(1.8);
+  border: solid 2px #fff;
+  transition: all .25s ease-in
+}
+
+body,
+.top-header a.nav-link {
+  color: #d1cdc7;
+}
+
+body {
+  background-color: #181a1b;
+}
+
+.top-header {
+  width: 100%;
+  margin: auto;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: rgba(255, 255, 255, .85);
+  background: linear-gradient(180deg, rgba(25, 25, 25, .31) 0%, rgba(25, 25, 25, .85) 100%);
+  border-bottom: 2px solid;
+  border-color: rgb(var(--bs-info-rgb));
+}
+
+.top-header h1 {
+  min-width: 175px
+}
+
+.top-header h1 {
+  font-size: 1.61em
+}
+
+.top-header h1 a {
+  text-decoration: none;
+  color: inherit
+}
+
+.container-fluid.top-header-navbar {
+  padding: 10px 5.2vw 10px 5.2vw
+}
+
+.top-header nav {
+  min-height: var(--navbar-height)
+}
+
+.navbar-menu li {
+  padding: 0 5px 0 5px
+}
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center
+}
+
+.navbar-nav a {
+  color: #000
+}
+
+
+.gallery .nav {
+  justify-content: center
+}
+
+@media (max-width: 1000px) {
+  .gallery .nav {
+    flex-direction: column;
+    text-align: center;
+    transform: scale(1.0125)
+  }
+
+  .gallery .nav button {
+    width: 100%
+  }
+
+  .mau.nav-link,
+  .mau.nav-link:hover {
+    transition: background-color .8s;
+  }
+}
+
+@media (max-width: 767px) {
+  .navbar .nav-item {
+    display: flex;
+    min-height: 63px;
+    align-items: center;
+    transform: scale(1.2)
+  }
 }

@@ -4,76 +4,508 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="Enhanced Mau Gallery, my first fork of a Javascript project">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" media="print"
     onload="this.media='all'">
-  <link rel="stylesheet" href="./assets/style.css" media="print" onload="this.media='all'">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" defer></script>
-  <script src="./assets/maugallery.js" defer></script>
-  <script src="./assets/scripts.js" defer></script>
-  <title>Mau Gallery!</title>
+  <link rel="stylesheet" href="./assets/style.css">
+  <script src="./assets/maugalleryLauncher.js" async defer></script>
+
+  <link rel="icon" type="image/x-icon" href="./assets/etc/favicon.ico">
+  <title>Enhanced Mau Gallery!</title>
 </head>
 
 <body>
-  <div class="jumbotron jumbotron-fluid bg-info mb-0">
-    <div class="container py-5 text-light">
-      <h1 class="display-4">Mau Gallery</h1>
-      <p class="lead">
-        A simple images gallery, built with Bootstrap 5
-      </p>
-      <a class="btn btn-outline-light btn-lg" href="https://github.com/bakedbird/mauGallery">GitHub</a>
+  <header class="top-header">
+    <nav class="navbar navbar-dark navbar-expand-md">
+      <div class="container-fluid top-header-navbar">
+        <h1><a href="#" class="trigger-navbar-collapse-onclick">Scroll to top</a></h1>
+        <button aria-label="Bouton de la barre de navigation" class="navbar-toggler" type="button"
+          data-bs-toggle="collapse" data-bs-target=".navbar-menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse navbar-menu" style="width:100%">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="#gallery-one">MG1</a></li>
+            <li class="nav-item"><a class="nav-link" href="#gallery-two">MG2</a></li>
+            <li class="nav-item"><a class="nav-link" href="#gallery-three">MG3</a></li>
+            <li class="nav-item"><a class="nav-link" href="#gallery-four">MG4</a></li>
+            <li class="nav-item"><a class="nav-link" href="#gallery-five">MG5</a></li>
+            <li class="nav-item"><a class="nav-link" href="#gallery-six">MG6</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div id="header">
+      <div id="carouselMauGallery" class="carousel slide" data-bs-keyboard="false" data-bs-ride="carousel"
+        data-bs-interval="7500">
+        <div class="carousel-inner">
+          <button aria-label="Previous photo" class="carousel-control-prev" type="button"
+            data-bs-target="#carouselMauGallery" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          </button>
+          <button aria-label="Next photo" class="carousel-control-next" type="button"
+            data-bs-target="#carouselMauGallery" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          </button>
+          <div class="carousel-indicators">
+            <div class="carousel-indicators-container">
+              <button type="button" data-bs-target="#carouselMauGallery" data-bs-slide-to="0" class="active"
+                aria-current="true" aria-label="Slide 1"></button>
+              <button type="button" data-bs-target="#carouselMauGallery" data-bs-slide-to="1"
+                aria-label="Slide 2"></button>
+              <button type="button" data-bs-target="#carouselMauGallery" data-bs-slide-to="2"
+                aria-label="Slide 3"></button>
+            </div>
+          </div>
+          <div class="carousel-item active">
+            <picture>
+              <source srcset="./assets/img/gallery-pack/pexels-photo-539432-mobile-portrait.webp"
+                media="(max-width: 480px)">
+              <source srcset="./assets/img/gallery-pack/pexels-photo-539432-mobile-landscape.webp"
+                media="(max-width: 1000px)">
+              <img src="./assets/img/gallery-pack/pexels-photo-539432-desktop.webp" alt="Banner (coffee photo)"
+                class="d-block w-100" width="1920" height="1080">
+            </picture>
+          </div>
+          <div class="carousel-item">
+            <picture>
+              <source srcset="./assets/img/gallery-pack/pexels-photo-59523-mobile-portrait.webp"
+                media="(max-width: 480px)">
+              <source srcset="./assets/img/gallery-pack/pexels-photo-59523-mobile-landscape.webp"
+                media="(max-width: 1000px)">
+              <img src="./assets/img/gallery-pack/pexels-photo-59523-desktop.webp" alt="Banner (dog photo)"
+                class="d-block w-100" width="1920" height="1080" loading="lazy">
+            </picture>
+          </div>
+          <div class="carousel-item">
+            <picture>
+              <source srcset="./assets/img/gallery-pack/pexels-photo-247204-mobile-portrait.webp"
+                media="(max-width: 480px)">
+              <source srcset="./assets/img/gallery-pack/pexels-photo-247204-mobile-landscape.webp"
+                media="(max-width: 1000px)">
+              <img src="./assets/img/gallery-pack/pexels-photo-247204-desktop.webp" alt="Banner (girls photo)"
+                class="d-block w-100" width="1920" height="1080" loading="lazy">
+            </picture>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="container py-3">
-    <div id="maugallery" class="gallery">
-      <img data-gallery-tag="women" class="mau gallery-item"
-        src="https://images.pexels.com/photos/413727/pexels-photo-413727.jpeg?auto=compress&cs=tinysrgb&h=350" />
-      <div class="mau gallery-item h-100">
-        <div
-          class="bg-danger d-flex flex-column text-warning justify-content-center align-items-center h-100 w-100 p-3">
-          <p class="lead m-0">I have no tag!</p>
-        </div>
+
+    <div class="jumbotron jumbotron-fluid bg-dark mb-0">
+      <div class="container py-5 text-light">
+        <h2 class="display-4">Enhanced Mau Gallery (Demo)</h2>
+        <h3 class="lead">
+          An images gallery, built with Bootstrap 5 and vanilla JS.
+        </h3>
+        <a class="btn btn-outline-light btn-lg" href="https://github.com/bakedbird/mauGallery">GitHub</a>
       </div>
-      <img data-gallery-tag="men" class="mau gallery-item"
-        src="https://images.pexels.com/photos/716411/pexels-photo-716411.jpeg?auto=compress&cs=tinysrgb&h=250" />
-      <img data-gallery-tag="coffee" class="mau gallery-item"
-        src="https://images.pexels.com/photos/539432/pexels-photo-539432.jpeg?auto=compress&cs=tinysrgb&h=350" />
-      <img data-gallery-tag="men" class="mau gallery-item"
-        src="https://images.pexels.com/photos/874158/pexels-photo-874158.jpeg?auto=compress&cs=tinysrgb&h=350" />
-      <img data-gallery-tag="dogs" class="mau gallery-item"
-        src="https://images.unsplash.com/photo-1517849845537-4d257902454a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=735&q=80" />
-      <img data-gallery-tag="women" class="mau gallery-item"
-        src="https://images.pexels.com/photos/428338/pexels-photo-428338.jpeg?auto=compress&cs=tinysrgb&h=950" />
-      <img data-gallery-tag="dogs" class="mau gallery-item"
-        src="https://images.pexels.com/photos/160846/french-bulldog-summer-smile-joy-160846.jpeg?auto=compress&cs=tinysrgb&h=350" />
-      <div class="mau gallery-item h-100">
-        <div class="bg-warning d-flex flex-column text-dark justify-content-center align-items-center h-100 w-100 p-3">
-          <p class="lead m-0">You can't filter me!</p>
-        </div>
+    </div>
+
+    <div class="container py-3" id="gallery-one">
+      <h2 class="mt-4">Boring pictures gallery</h2>
+      <div id="maugallery" class="gallery">
+        <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
+          component in action</div>
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-413727-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-413727-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-413727-desktop.webp"
+            alt="Woman photo : black and white/sepia photography of a long-haired woman wearing a hat."
+            data-gallery-tag="Women" class="mau gallery-item" style="display:none;object-fit:cover;" width="440"
+            height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-716411-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-716411-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-716411-desktop.webp"
+            alt="Man photo : photography of a man sitting on a chair, legs crossed, looking out the window."
+            data-gallery-tag="Men" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-539432-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-539432-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-539432-desktop.webp"
+            alt="Coffee photo : photography of a coffee mug, plain yellow background." data-gallery-tag="Coffee"
+            class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy" width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-874158-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-874158-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-874158-desktop.webp"
+            alt="Man photo : a standing man wearing a turtleneck sweater and glasses, with a three-day beard, behind which we see a university. Outdoor photograph in daylight, blurred background."
+            data-gallery-tag="Men" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/photo-1517849845537-4d257902454a-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/photo-1517849845537-4d257902454a-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/photo-1517849845537-4d257902454a-desktop.webp"
+            alt="Dog photo : photography of a black bulldog wearing a knit. Plain yellow background."
+            data-gallery-tag="Dogs" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-428338-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-428338-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-428338-desktop.webp"
+            alt="Woman photo : a photography of a smiling woman wearing a grey short-sleeved t-shirt, a watch with a white silicone strap, sunglasses with a brown frame, jeans, and a black belt. Plain white background."
+            data-gallery-tag="Women" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/french-bulldog-summer-smile-joy-160846-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/french-bulldog-summer-smile-joy-160846-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/french-bulldog-summer-smile-joy-160846-desktop.webp"
+            alt="Dog photo : a photography of a happy French bulldog, wearing a red collar, standing with both front paws resting on a white ledge. Rather green country blurred background, with a white sky."
+            data-gallery-tag="Dogs" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-434213-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-434213-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-434213-desktop.webp"
+            alt="Coffee photo : photography of a white cup of steaming coffee, set on a bed of coffee beans above which there is a brown textured wood blurred background."
+            data-gallery-tag="Coffee" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-373899-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-373899-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-373899-desktop.webp"
+            alt="Man photo : a photography of a dark-haired man with green eyes posed in front of a gray pallet wood exterior wall, wearing a thin gold chain, a blue-gray wool sweater with a round neck, and a navy blue down jacket, holding a cup of hot chocolate with both hands."
+            data-gallery-tag="Men" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-1036621-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-1036621-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-1036621-desktop.webp"
+            alt="Woman photo : photography of a brown-eyed Asian woman, wearing red nail polish on both hands, holding a cupcake in her right hand and tasting the cream of the cake on one fingertip of her left hand. Plain pink background."
+            data-gallery-tag="Women" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-272887-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-272887-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-272887-desktop.webp"
+            alt="Coffee photo : top view photo of two steaming cups of coffee, each held by a hand. The one on the left is held by the hand of a white woman, of whom we can only see her hand and a part of her arm on which she wears bracelets. The one on the right is held by a white man whose hand is visible only."
+            data-gallery-tag="Coffee" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-356378-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-356378-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-356378-desktop.webp"
+            alt="Dog photo : photography of an American Eskimo dog with green eyes lying in the grass with his tongue out. Blurred background."
+            data-gallery-tag="Dogs" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-247204-mobile-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-247204-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-247204-desktop.webp"
+            alt="Woman photo : photography of two beautiful young Slavic women with makeup, wearing rather light fashion outfits and fashion accessories like jewelry, bracelets, necklaces, or red or white nail polish."
+            data-gallery-tag="Women" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
+
+        <picture>
+          <source srcset="./assets/img/gallery-pack/pexels-photo-59523-mobile-portrait.webp" media="(max-width: 480px)">
+          <source srcset="./assets/img/gallery-pack/pexels-photo-59523-mobile-landscape.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/gallery-pack/pexels-photo-59523-desktop.webp"
+            alt="Dog photo : photography of a brown-haired puppy, wearing a red collar, sitting on a white sea rush floor. Blurred background."
+            data-gallery-tag="Dogs" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+            width="440" height="440">
+        </picture>
       </div>
-      <img data-gallery-tag="coffee" class="mau gallery-item"
-        src="https://images.pexels.com/photos/434213/pexels-photo-434213.jpeg?auto=compress&cs=tinysrgb&h=550" />
-      <img data-gallery-tag="men" class="mau gallery-item"
-        src="https://images.pexels.com/photos/373899/pexels-photo-373899.jpeg?auto=compress&cs=tinysrgb&h=750" />
-      <img data-gallery-tag="women" class="mau gallery-item"
-        src="https://images.pexels.com/photos/1036621/pexels-photo-1036621.jpeg?auto=compress&cs=tinysrgb&h=350" />
-      <img data-gallery-tag="coffee" class="mau gallery-item"
-        src="https://images.pexels.com/photos/272887/pexels-photo-272887.jpeg?auto=compress&cs=tinysrgb&h=350" />
-      <img data-gallery-tag="dogs" class="mau gallery-item"
-        src="https://images.pexels.com/photos/356378/pexels-photo-356378.jpeg?auto=compress&cs=tinysrgb&h=750" />
-      <div class="mau gallery-item h-100">
-        <div class="bg-info d-flex flex-column text-warning justify-content-center align-items-center h-100 w-100 p-3">
-          <p class="lead m-0">Me neigher.</p>
-        </div>
-      </div>
-      <img data-gallery-tag="women" class="mau gallery-item"
-        src="https://images.pexels.com/photos/247204/pexels-photo-247204.jpeg?auto=compress&cs=tinysrgb&h=350" />
-      <img data-gallery-tag="dogs" class="mau gallery-item"
-        src="https://images.pexels.com/photos/59523/pexels-photo-59523.jpeg?auto=compress&cs=tinysrgb&h=350" />
     </div>
     <hr />
-    <i>more to come here...</i>
-  </div>
+
+    <div class="container py-3" id="gallery-two">
+      <h2>The same boring pictures gallery, but Dall-E 2 generated</h2>
+      <div id="maugallery-dalle" class="gallery">
+        <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
+          component in action</div>
+        <img src="./assets/img/dalle/b&w-sepia-woman-hat.webp"
+          alt="Woman photo : black and white/sepia photography of a long-haired woman wearing a hat. (DALL-E 2 generated.)"
+          data-gallery-tag="Women" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/man-sitting-window.webp"
+          alt="Man photo : photography of a man sitting on a chair, legs crossed, looking out the window. (DALL-E 2 generated.)"
+          data-gallery-tag="Men" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/coffee-mug-plain-yellow-bg.webp"
+          alt="Coffee photo : photography of a coffee mug, plain yellow background. (DALL-E 2 generated.)"
+          data-gallery-tag="Coffee" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/standing-man-university.webp"
+          alt="Man photo : a standing man wearing a turtleneck sweater and glasses, with a three-day beard, behind which we see a university. Outdoor photograph in daylight, blurred background. (DALL-E 2 generated.)"
+          data-gallery-tag="Men" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/black-bulldog-knit-plain-yellow-bg.webp"
+          alt="Dog photo : photography of a black bulldog wearing a knit. Plain yellow background. (DALL-E 2 generated.)"
+          data-gallery-tag="Dogs" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/smiling-woman.webp"
+          alt="Woman photo : a photography of a smiling woman wearing a grey short-sleeved t-shirt, a watch with a white silicone strap, sunglasses with a brown frame, jeans, and a black belt. Plain white background. (DALL-E 2 generated.)"
+          data-gallery-tag="Women" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/happy-french-bulldog.webp"
+          alt="Dog photo : a photography of a happy French bulldog, wearing a red collar, standing with both front paws resting on a white ledge. Rather green country blurred background, with a white sky. (DALL-E 2 generated.)"
+          data-gallery-tag="Dogs" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/steaming-cup-of-coffee.webp"
+          alt="Coffee photo : photography of a white cup of steaming coffee, set on a bed of coffee beans above which there is a brown textured wood blurred background. (DALL-E 2 generated.)"
+          data-gallery-tag="Coffee" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/man-chocolate-wood-exterior.webp"
+          alt="Man photo : a photography of a dark-haired man with green eyes posed in front of a gray pallet wood exterior wall, wearing a thin gold chain, a blue-gray wool sweater with a round neck, and a navy blue down jacket, holding a cup of hot chocolate with both hands. (DALL-E 2 generated.)"
+          data-gallery-tag="Men" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/asian-woman-cupcake.webp"
+          alt="Woman photo : photography of a brown-eyed Asian woman, wearing red nail polish on both hands, holding a cupcake in her right hand and tasting the cream of the cake on one fingertip of her left hand. Plain pink background. (DALL-E 2 generated.)"
+          data-gallery-tag="Women" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/top-view-coffee.webp"
+          alt="Coffee photo : top view photo of two steaming cups of coffee, each held by a hand. The one on the left is held by the hand of a white woman, of whom we can only see her hand and a part of her arm on which she wears bracelets. The one on the right is held by a white man whose hand is visible only. (DALL-E 2 generated.)"
+          data-gallery-tag="Coffee" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/american-eskimo-grass.webp"
+          alt="Dog photo : photography of an American Eskimo dog with green eyes lying in the grass with his tongue out. Blurred background. (DALL-E 2 generated.)"
+          data-gallery-tag="Dogs" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/slavic-women.webp"
+          alt="Woman photo : photography of two beautiful young Slavic women with makeup, wearing rather light fashion outfits and fashion accessories like jewelry, bracelets, necklaces, or red or white nail polish. (DALL-E 2 generated.)"
+          data-gallery-tag="Women" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+        <img src="./assets/img/dalle/puppy.webp"
+          alt="Dog photo : photography of a brown-haired puppy, wearing a red collar, sitting on a white sea rush floor. Blurred background. (DALL-E 2 generated.)"
+          data-gallery-tag="Dogs" class="mau gallery-item" style="display:none;object-fit:cover;" loading="lazy"
+          width="440" height="440">
+      </div>
+    </div>
+    <hr />
+
+    <div class="container py-3" id="gallery-three">
+      <h2>Another boring pictures gallery</h2>
+      <h3>Navigation option setted to 'false' (click on a picture to see it in 'inaction')</h3>
+      <h4>Filters tag position option setted to 'bottom'</h4>
+      <div id="maugallery-without-navigation-example" class="gallery">
+        <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
+          component in action</div>
+        <picture>
+          <source srcset="./assets/img/another-gallery-pack/mobile/portrait/concerts/aaron-paul-concert.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/another-gallery-pack/mobile/landscape/concerts/aaron-paul-concert.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/another-gallery-pack/desktop/concerts/aaron-paul-concert.webp"
+            alt="Concert photo : Aaron Paul" data-gallery-tag="Concerts" class="mau gallery-item"
+            style="display:none;object-fit:cover;" loading="lazy" width="440" height="440">
+        </picture>
+        <picture>
+          <source
+            srcset="./assets/img/another-gallery-pack/mobile/portrait/entreprises/ali-morshedlou-entrepreneur.webp"
+            media="(max-width: 480px)">
+          <source
+            srcset="./assets/img/another-gallery-pack/mobile/landscape/entreprises/ali-morshedlou-entrepreneur.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/another-gallery-pack/desktop/entreprises/ali-morshedlou-entrepreneur.webp"
+            alt="Enterprise photo : Ali Morshedlou" data-gallery-tag="Enterprises" class="mau gallery-item"
+            style="display:none;object-fit:cover;" loading="lazy" width="440" height="440">
+        </picture>
+        <picture>
+          <source srcset="./assets/img/another-gallery-pack/mobile/portrait/entreprises/jason-goodman-entreprise.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/another-gallery-pack/mobile/landscape/entreprises/jason-goodman-entreprise.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/another-gallery-pack/desktop/entreprises/jason-goodman-entreprise.webp"
+            alt="Enterprise photo : Jason Goodman" data-gallery-tag="Enterprises" class="mau gallery-item"
+            style="display:none;object-fit:cover;" loading="lazy" width="440" height="440">
+        </picture>
+        <picture>
+          <source srcset="./assets/img/another-gallery-pack/mobile/portrait/mariages/hannah-busing-mariage.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/another-gallery-pack/mobile/landscape/mariages/hannah-busing-mariage.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/another-gallery-pack/desktop/mariages/hannah-busing-mariage.webp"
+            alt="Wedding photo : Hannah Busing" data-gallery-tag="Weddings" class="mau gallery-item"
+            style="display:none;object-fit:cover;" loading="lazy" width="440" height="440">
+        </picture>
+        <picture>
+          <source srcset="./assets/img/another-gallery-pack/mobile/portrait/portraits/ade-tunji-portrait.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/another-gallery-pack/mobile/landscape/portraits/ade-tunji-portrait.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/another-gallery-pack/desktop/portraits/ade-tunji-portrait.webp"
+            alt="Portrait photo : Ade Tunji" data-gallery-tag="Portraits" class="mau gallery-item"
+            style="display:none;object-fit:cover;" loading="lazy" width="440" height="440">
+        </picture>
+        <picture>
+          <source srcset="./assets/img/another-gallery-pack/mobile/portrait/mariages/jakob-owens-mariage.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/another-gallery-pack/mobile/landscape/mariages/jakob-owens-mariage.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/another-gallery-pack/desktop/mariages/jakob-owens-mariage.webp"
+            alt="Wedding photo : Jakob Owens" data-gallery-tag="Weddings" class="mau gallery-item"
+            style="display:none;object-fit:cover;" loading="lazy" width="440" height="440">
+        </picture>
+        <picture>
+          <source
+            srcset="./assets/img/another-gallery-pack/mobile/portrait/portraits/nino-van-prattenburg-photo-portrait.webp"
+            media="(max-width: 480px)">
+          <source
+            srcset="./assets/img/another-gallery-pack/mobile/landscape/portraits/nino-van-prattenburg-photo-portrait.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/another-gallery-pack/desktop/portraits/nino-van-prattenburg-photo-portrait.webp"
+            alt="Portrait photo : Nino Van Prattenburg" data-gallery-tag="Portraits" class="mau gallery-item"
+            style="display:none;object-fit:cover;" loading="lazy" width="440" height="440">
+        </picture>
+        <picture>
+          <source srcset="./assets/img/another-gallery-pack/mobile/portrait/concerts/austin-neill-spectacle.webp"
+            media="(max-width: 480px)">
+          <source srcset="./assets/img/another-gallery-pack/mobile/landscape/concerts/austin-neill-spectacle.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/another-gallery-pack/desktop/concerts/austin-neill-spectacle.webp"
+            alt="Concert photo : Austin Neill" data-gallery-tag="Concerts" class="mau gallery-item"
+            style="display:none;object-fit:cover;" loading="lazy" width="440" height="440">
+        </picture>
+        <picture>
+          <source
+            srcset="./assets/img/another-gallery-pack/mobile/portrait/entreprises/mateus-campos-felipe-startup.webp"
+            media="(max-width: 480px)">
+          <source
+            srcset="./assets/img/another-gallery-pack/mobile/landscape/entreprises/mateus-campos-felipe-startup.webp"
+            media="(max-width: 1000px)">
+          <img src="./assets/img/another-gallery-pack/desktop/entreprises/mateus-campos-felipe-startup.webp"
+            alt="Enterprise photo : Mateus Campos Felipe" data-gallery-tag="Enterprises" class="mau gallery-item"
+            style="display:none;object-fit:cover;" loading="lazy" width="440" height="440">
+        </picture>
+      </div>
+    </div>
+    <hr />
+
+    <div class="container py-3" id="gallery-four">
+      <h2>Video games pictures gallery</h2>
+      <h3>All categories only have 1 picture.</h3>
+      <h4>See how the modal navigation adapts when you're in a single-item collection.</h4>
+      <div id="maugallery-vg" class="gallery">
+        <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
+          component in action</div>
+        <img src="./assets/img/vg/minish-cap.webp" alt="Video game picture : Zelda Minish Cap"
+          data-gallery-tag="Zelda Minish Cap" class="mau gallery-item" style="display:none;object-fit:cover;"
+          loading="lazy" width="440" height="440">
+        <img src="./assets/img/vg/shadow-of-the-colossus.webp" alt="Video game picture : Shadow of the Colossus"
+          data-gallery-tag="Shadow of the Colossus" class="mau gallery-item" style="display:none;object-fit:cover;"
+          loading="lazy" width="440" height="440">
+        <img src="./assets/img/vg/the-last-guardian.webp" alt="Video game picture : The Last Guardian"
+          data-gallery-tag="The Last Guardian" class="mau gallery-item" style="display:none;object-fit:cover;"
+          loading="lazy" width="440" height="440">
+      </div>
+    </div>
+    <hr />
+    <div class="container py-3" id="gallery-five">
+      <h2>Video games pictures gallery</h2>
+      <h3>Disabled filter tags</h3>
+      <div id="maugallery-vg-disabled-filters" class="gallery">
+        <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
+          component in action</div>
+        <img src="./assets/img/vg/minish-cap.webp" alt="Video game picture : Zelda Minish Cap"
+          data-gallery-tag="Zelda Minish Cap" class="mau gallery-item" style="display:none;object-fit:cover;"
+          loading="lazy" width="440" height="440">
+        <img src="./assets/img/vg/shadow-of-the-colossus.webp" alt="Video game picture : Shadow of the Colossus"
+          data-gallery-tag="Shadow of the Colossus" class="mau gallery-item" style="display:none;object-fit:cover;"
+          loading="lazy" width="440" height="440">
+        <img src="./assets/img/vg/the-last-guardian.webp" alt="Video game picture : The Last Guardian"
+          data-gallery-tag="The Last Guardian" class="mau gallery-item" style="display:none;object-fit:cover;"
+          loading="lazy" width="440" height="440">
+      </div>
+    </div>
+    <hr />
+    <div class="container py-3" id="gallery-six">
+      <h2>Video games pictures gallery</h2>
+      <h3>Disabled filter tags & disabled modal</h3>
+      <div id="maugallery-vg-disabled-filters-disabled-modal" class="gallery">
+        <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
+          component in action</div>
+        <img src="./assets/img/vg/minish-cap.webp" alt="Video game picture : Zelda Minish Cap"
+          data-gallery-tag="Zelda Minish Cap" class="mau gallery-item" style="display:none;object-fit:cover;"
+          loading="lazy" width="440" height="440">
+        <img src="./assets/img/vg/shadow-of-the-colossus.webp" alt="Video game picture : Shadow of the Colossus"
+          data-gallery-tag="Shadow of the Colossus" class="mau gallery-item" style="display:none;object-fit:cover;"
+          loading="lazy" width="440" height="440">
+        <img src="./assets/img/vg/the-last-guardian.webp" alt="Video game picture : The Last Guardian"
+          data-gallery-tag="The Last Guardian" class="mau gallery-item" style="display:none;object-fit:cover;"
+          loading="lazy" width="440" height="440">
+      </div>
+    </div>
+    <div class="container">
+      <div class="alert alert-dark text-center" role="alert">Hey! Run this page in a disabled Javascript context to see
+        how it adapts (You can use NoScript to do this, for example)</div>
+    </div>
+
+    <div class="jumbotron jumbotron-fluid bg-dark mb-0">
+      <div class="container py-5 text-light">
+        <h2 class="display-4">Lorem ipsum dolor</h2>
+        <h3>Sit amet consectetur adipisicing elit.</h3>
+        <p class="lead">
+          Illo libero vel quasi quod autem? Ea architecto earum nam eveniet.<br>
+          Dolore libero pariatur alias, eos natus nesciunt adipisci! Dicta, possimus quod..</p>
+        <p class="lead"><strong>Lorem ipsum dolor sit amet</strong></p>
+        <hr />
+        <h4>Consectetur adipisicing elit.</h4>
+        <p class="lead">
+          Facere unde cupiditate labore magni! Maxime velit nisi doloremque fugiat voluptatem quidem iusto, quaerat molestiae modi inventore, non error enim impedit officia.
+        </p>
+        <a class="btn btn-outline-light btn-lg" href="https://github.com/bakedbird/mauGallery">Fork me on
+          GitHub!</a>
+      </div>
+    </div>
+
+  </main>
 </body>
 
 </html>
