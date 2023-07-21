@@ -247,7 +247,7 @@ let _asyncMauGalleryLauncher = {
                   break;
                 }
               }
-              if (brokeTheChain) {
+              if (!brokeTheChain) {
                 return feature;
               }
             }
