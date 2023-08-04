@@ -470,11 +470,11 @@ Object.assign(_mauGalleryManager, {
       }
 
       getElementHeight(element) {
-        return parseInt(window.getComputedStyle(element).height, 10);
+        return parseFloat(window.getComputedStyle(element).height, 10);
       }
 
       getElementWidth(element) {
-        return parseInt(window.getComputedStyle(element).width, 10);
+        return parseFloat(window.getComputedStyle(element).width, 10);
       }
 
       getElementBottomPx(element, lazy = false) {
