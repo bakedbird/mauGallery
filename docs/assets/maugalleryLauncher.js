@@ -29,98 +29,30 @@ let _asyncMauGalleryLauncher = {
           }
         };
 
-        this.mauGalleriesConfig = [
-          {
-            'columns': {
-              'xs': 1,
-              'sm': 2,
-              'md': 3,
-              'lg': 3,
-              'xl': 3
-            },
-            'lightBox': true,
-            'navigation': true,
-            'showTags': true,
-            'galleryRootNodeId': 'maugallery',
-            'tagsPosition': 'top',
-            'mutableOptions': false
-          },
-          {
-            'columns': {
-              'xs': 1,
-              'sm': 2,
-              'md': 3,
-              'lg': 3,
-              'xl': 3
-            },
-            'lightBox': true,
-            'navigation': true,
-            'showTags': true,
-            'galleryRootNodeId': 'maugallery-dalle',
-            'tagsPosition': 'top',
-            'mutableOptions': false
-          },
-          {
-            'columns': {
-              'xs': 1,
-              'sm': 2,
-              'md': 3,
-              'lg': 3,
-              'xl': 3
-            },
-            'lightBox': true,
-            'navigation': false,
-            'showTags': true,
-            'galleryRootNodeId': 'maugallery-without-navigation-example',
-            'tagsPosition': 'bottom',
-            'mutableOptions': false
-          },
-          {
-            'columns': {
-              'xs': 1,
-              'sm': 2,
-              'md': 3,
-              'lg': 3,
-              'xl': 3
-            },
-            'lightBox': true,
-            'navigation': true,
-            'showTags': true,
-            'galleryRootNodeId': 'maugallery-vg',
-            'tagsPosition': 'top',
-            'mutableOptions': false
-          },
-          {
-            'columns': {
-              'xs': 1,
-              'sm': 2,
-              'md': 3,
-              'lg': 3,
-              'xl': 3
-            },
-            'lightBox': true,
-            'navigation': true,
-            'showTags': false,
-            'galleryRootNodeId': 'maugallery-vg-disabled-filters',
-            'tagsPosition': 'top',
-            'mutableOptions': false
-          },
-          {
-            'columns': {
-              'xs': 1,
-              'sm': 2,
-              'md': 3,
-              'lg': 3,
-              'xl': 3
-            },
-            'lightBox': false,
-            'navigation': false,
-            'showTags': false,
-            'galleryRootNodeId': 'maugallery-vg-disabled-filters-disabled-modal',
-            'tagsPosition': 'top',
-            'mutableOptions': false
-          }
-        ];
+        const galleryElements = document.querySelectorAll("[data-mau-gallery-id]");
+        const prefix = this.globalMauGalleryConfig["mauPrefixClass"]
+        this.mauGalleriesConfig = [];
+
+        galleryElements.forEach(currentGalleryInstanceDOMElement => {
+          const galleryRootNodeId = currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-gallery-id`);
+          const currentGalleryConfig = {
+            galleryRootNodeId,
+            lightBox: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-lightbox`) === "true",
+            navigation: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-navigation`) === "true",
+            showTags: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-showtags`) === "true",
+            tagsPosition: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-tagsposition`),
+            mutableOptions: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-mutable-options`) === "true",
+            columns: {
+              xs: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-xs`)),
+              sm: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-sm`)),
+              md: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-md`)),
+              lg: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-lg`)),
+              xl: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-xl`)),
+            }
+          };
+          currentGalleryInstanceDOMElement.id = galleryRootNodeId;
+          this.mauGalleriesConfig.push(currentGalleryConfig);
+        });
 
         this.PKGData = {
           'bootstrap': {

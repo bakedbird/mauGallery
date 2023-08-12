@@ -99,7 +99,7 @@
       <div class="container py-5 text-light">
         <h2 class="display-4">Enhanced Mau Gallery (Demo)</h2>
         <h3 class="lead">
-          An images gallery, built with Bootstrap 5 and vanilla JS.
+          An alphamale gigachad images gallery (lol), built with Bootstrap 5 and vanilla JS.
         </h3>
         <a class="btn btn-outline-light btn-lg" href="https://github.com/bakedbird/mauGallery">GitHub</a>
       </div>
@@ -107,7 +107,9 @@
 
     <div class="container py-3" id="gallery-one">
       <h2 class="mt-4">Boring pictures gallery</h2>
-      <div id="maugallery" class="gallery">
+      <div class="gallery" data-mau-gallery-id="maugallery" data-mau-lightbox="true" data-mau-navigation="true"
+        data-mau-showtags="true" data-mau-tagsposition="top" data-mau-mutable-options="false" data-mau-columns-xs="1"
+        data-mau-columns-sm="2" data-mau-columns-md="3" data-mau-columns-lg="3" data-mau-columns-xl="3">
         <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
           component in action</div>
         <picture>
@@ -267,7 +269,9 @@
 
     <div class="container py-3" id="gallery-two">
       <h2>The same boring pictures gallery, but Dall-E 2 generated</h2>
-      <div id="maugallery-dalle" class="gallery">
+      <div class="gallery" data-mau-gallery-id="maugallery-dalle" data-mau-lightbox="true" data-mau-navigation="true"
+        data-mau-showtags="true" data-mau-tagsposition="top" data-mau-mutable-options="false" data-mau-columns-xs="1"
+        data-mau-columns-sm="2" data-mau-columns-md="3" data-mau-columns-lg="3" data-mau-columns-xl="3">
         <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
           component in action</div>
         <img src="./assets/img/dalle/b&w-sepia-woman-hat.webp"
@@ -334,7 +338,10 @@
       <h2>Another boring pictures gallery</h2>
       <h3>Navigation option setted to 'false' (click on a picture to see it in 'inaction')</h3>
       <h4>Filters tag position option setted to 'bottom'</h4>
-      <div id="maugallery-without-navigation-example" class="gallery">
+      <div class="gallery" data-mau-gallery-id="maugallery-without-navigation-example" data-mau-lightbox="true"
+        data-mau-navigation="false" data-mau-showtags="true" data-mau-tagsposition="bottom"
+        data-mau-mutable-options="false" data-mau-columns-xs="1" data-mau-columns-sm="2" data-mau-columns-md="3"
+        data-mau-columns-lg="3" data-mau-columns-xl="3">
         <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
           component in action</div>
         <picture>
@@ -432,7 +439,9 @@
       <h2>Video games pictures gallery</h2>
       <h3>All categories only have 1 picture.</h3>
       <h4>See how the modal navigation adapts when you're in a single-item collection.</h4>
-      <div id="maugallery-vg" class="gallery">
+      <div class="gallery" data-mau-gallery-id="maugallery-vg" data-mau-lightbox="true" data-mau-navigation="true"
+        data-mau-showtags="true" data-mau-tagsposition="top" data-mau-mutable-options="false" data-mau-columns-xs="1"
+        data-mau-columns-sm="2" data-mau-columns-md="3" data-mau-columns-lg="3" data-mau-columns-xl="3">
         <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
           component in action</div>
         <img src="./assets/img/vg/minish-cap.webp" alt="Video game picture : Zelda Minish Cap"
@@ -450,7 +459,10 @@
     <div class="container py-3" id="gallery-five">
       <h2>Video games pictures gallery</h2>
       <h3>Disabled filter tags</h3>
-      <div id="maugallery-vg-disabled-filters" class="gallery">
+      <div class="gallery" data-mau-gallery-id="maugallery-vg-disabled-filters" data-mau-lightbox="true"
+        data-mau-navigation="true" data-mau-showtags="false" data-mau-tagsposition="top"
+        data-mau-mutable-options="false" data-mau-columns-xs="1" data-mau-columns-sm="2" data-mau-columns-md="3"
+        data-mau-columns-lg="3" data-mau-columns-xl="3">
         <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
           component in action</div>
         <img src="./assets/img/vg/minish-cap.webp" alt="Video game picture : Zelda Minish Cap"
@@ -468,7 +480,10 @@
     <div class="container py-3" id="gallery-six">
       <h2>Video games pictures gallery</h2>
       <h3>Disabled filter tags & disabled modal</h3>
-      <div id="maugallery-vg-disabled-filters-disabled-modal" class="gallery">
+      <div class="gallery" data-mau-gallery-id="maugallery-vg-disabled-filters-disabled-modal" data-mau-lightbox="false"
+        data-mau-navigation="false" data-mau-showtags="false" data-mau-tagsposition="top"
+        data-mau-mutable-options="false" data-mau-columns-xs="1" data-mau-columns-sm="2" data-mau-columns-md="3"
+        data-mau-columns-lg="3" data-mau-columns-xl="3">
         <div class="mau gallery-placeholder alert alert-info" role="alert">Please, enable Javascript to see this gallery
           component in action</div>
         <img src="./assets/img/vg/minish-cap.webp" alt="Video game picture : Zelda Minish Cap"
@@ -489,16 +504,16 @@
 
     <div class="jumbotron jumbotron-fluid bg-dark mb-0">
       <div class="container py-5 text-light">
-        <h2 class="display-4">Lorem ipsum dolor</h2>
-        <h3>Sit amet consectetur adipisicing elit.</h3>
+        <h2 class="display-4">Disclaimer</h2>
+        <h3>First of all: any PR is welcome!</h3>
         <p class="lead">
-          Illo libero vel quasi quod autem? Ea architecto earum nam eveniet.<br>
-          Dolore libero pariatur alias, eos natus nesciunt adipisci! Dicta, possimus quod..</p>
-        <p class="lead"><strong>Lorem ipsum dolor sit amet</strong></p>
+          This side project is my FIRST vanilla JS script.<br>
+          It probably not includes all the most rigorous ways to achieve the sake of this project.</p>
+        <p class="lead"><strong>I have a lot to learn. Maybe from you?</strong></p>
         <hr />
-        <h4>Consectetur adipisicing elit.</h4>
+        <h4>Remember that it is an EXPERIMENTAL and PERSONAL project.</h4>
         <p class="lead">
-          Facere unde cupiditate labore magni! Maxime velit nisi doloremque fugiat voluptatem quidem iusto, quaerat molestiae modi inventore, non error enim impedit officia.
+          I'm nor a vanilla JS, nor a web design pro.
         </p>
         <a class="btn btn-outline-light btn-lg" href="https://github.com/bakedbird/mauGallery">Fork me on
           GitHub!</a>
