@@ -29,30 +29,37 @@ let _asyncMauGalleryLauncher = {
           }
         };
 
-        const galleryElements = document.querySelectorAll("[data-mau-gallery-id]");
-        const prefix = this.globalMauGalleryConfig["mauPrefixClass"]
+        this.readyToMountGalleriesComponent = false;
         this.mauGalleriesConfig = [];
+        const me = this;
 
-        galleryElements.forEach(currentGalleryInstanceDOMElement => {
-          const galleryRootNodeId = currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-gallery-id`);
-          const currentGalleryConfig = {
-            galleryRootNodeId,
-            lightBox: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-lightbox`) === "true",
-            navigation: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-navigation`) === "true",
-            showTags: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-showtags`) === "true",
-            tagsPosition: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-tagsposition`),
-            mutableOptions: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-mutable-options`) === "true",
-            columns: {
-              xs: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-xs`)),
-              sm: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-sm`)),
-              md: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-md`)),
-              lg: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-lg`)),
-              xl: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-xl`)),
-            }
-          };
-          currentGalleryInstanceDOMElement.id = galleryRootNodeId;
-          this.mauGalleriesConfig.push(currentGalleryConfig);
-        });
+        window.addEventListener('load', () => {
+          const prefix = me.globalMauGalleryConfig["mauPrefixClass"];
+          const galleryElements = document.querySelectorAll(`[data-${prefix}-gallery-id]`);
+          me.mauGalleriesConfig = [];
+    
+          galleryElements.forEach(currentGalleryInstanceDOMElement => {
+            const galleryRootNodeId = currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-gallery-id`);
+            const currentGalleryConfig = {
+              galleryRootNodeId,
+              lightBox: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-lightbox`) === "true",
+              navigation: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-navigation`) === "true",
+              showTags: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-showtags`) === "true",
+              tagsPosition: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-tagsposition`),
+              mutableOptions: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-mutable-options`) === "true",
+              columns: {
+                xs: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-xs`)),
+                sm: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-sm`)),
+                md: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-md`)),
+                lg: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-lg`)),
+                xl: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-xl`)),
+              }
+            };
+            currentGalleryInstanceDOMElement.id = galleryRootNodeId;
+            me.mauGalleriesConfig.push(currentGalleryConfig);
+            me.readyToMountGalleriesComponent = true;
+          });
+        })
 
         this.PKGData = {
           'bootstrap': {
@@ -78,6 +85,7 @@ let _asyncMauGalleryLauncher = {
           },
 
           function runMauGallery() {
+            while (!_asyncMauGalleryLauncher.Launcher_Instance['readyToMountGalleriesComponent']) {}
             _asyncMauGalleryLauncher.Launcher_Instance['mauGalleriesConfig'].forEach(conf => new _mauGalleryManager.MauGallery(conf));
           }
         ];
