@@ -37,7 +37,7 @@ let _asyncMauGalleryLauncher = {
           const prefix = me.globalMauGalleryConfig["mauPrefixClass"];
           const galleryElements = document.querySelectorAll(`[data-${prefix}-gallery-id]`);
           me.mauGalleriesConfig = [];
-    
+
           galleryElements.forEach(currentGalleryInstanceDOMElement => {
             const galleryRootNodeId = currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-gallery-id`);
             const currentGalleryConfig = {
@@ -85,8 +85,13 @@ let _asyncMauGalleryLauncher = {
           },
 
           function runMauGallery() {
-            while (!_asyncMauGalleryLauncher.Launcher_Instance['readyToMountGalleriesComponent']) {}
-            _asyncMauGalleryLauncher.Launcher_Instance['mauGalleriesConfig'].forEach(conf => new _mauGalleryManager.MauGallery(conf));
+            const launcherPtr = _asyncMauGalleryLauncher;
+            const coroutine = setInterval(() => {
+              if (launcherPtr.Launcher_Instance['readyToMountGalleriesComponent']) {
+                clearInterval(coroutine);
+                launcherPtr.Launcher_Instance['mauGalleriesConfig'].forEach(conf => new _mauGalleryManager.MauGallery(conf));
+              };
+            }, 1);
           }
         ];
 
