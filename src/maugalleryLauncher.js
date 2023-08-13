@@ -5,61 +5,11 @@ let _asyncMauGalleryLauncher = {
         this.failedToLoadMauGalleryMsg = "Failed to load MauGallery! Please, retry to load this page.";
         this.boostrapIsAsyncLoadedSomewhereElseInMyCodebasePleaseDoNotAsyncLoadItHereImBeggingYou = false;
         this.globalMauGalleryConfig = {
-          'anyImageServedByHTTP1Server': true,
-          'mauPrefixClass': 'mau',
-          'lightboxId': 'myAwesomeLightbox',
-          'prevImgButtonLabel': 'Previous image',
-          'nextImgButtonLabel': 'Next image',
-          'disableFiltersButtonLabel': 'All',
-          'modalTriggerClass': 'modal-trigger',
-          'galleryItemClass': 'gallery-item',
-          'modalWrapperClass': 'modal-component',
-          'galleryPlaceHolderClass': 'gallery-placeholder',
-          'styles': {
-            'animation': {
-              'modal': {
-                'arrowTransitionDelay': '.4s'
-              }
-            },
-            'modal': {
-              'navigation': {
-                'arrowBoxesSizeObj': { size: '50', unit: 'px' }
-              }
-            }
-          }
+          'mauPrefixClass': 'mau'
         };
 
         this.readyToMountGalleriesComponents = false;
         this.mauGalleriesConfig = [];
-        const me = this;
-
-        window.addEventListener('load', () => {
-          const prefix = me.globalMauGalleryConfig["mauPrefixClass"];
-          const galleryElements = document.querySelectorAll(`[data-${prefix}-gallery-id]`);
-          me.mauGalleriesConfig = [];
-
-          galleryElements.forEach(currentGalleryInstanceDOMElement => {
-            const galleryRootNodeId = currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-gallery-id`);
-            const currentGalleryConfig = {
-              galleryRootNodeId,
-              lightBox: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-lightbox`) === "true",
-              navigation: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-navigation`) === "true",
-              showTags: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-showtags`) === "true",
-              tagsPosition: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-tagsposition`),
-              mutableOptions: currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-mutable-options`) === "true",
-              columns: {
-                xs: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-xs`)),
-                sm: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-sm`)),
-                md: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-md`)),
-                lg: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-lg`)),
-                xl: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${prefix}-columns-xl`)),
-              }
-            };
-            currentGalleryInstanceDOMElement.id = galleryRootNodeId;
-            me.mauGalleriesConfig.push(currentGalleryConfig);
-            me.readyToMountGalleriesComponents = true;
-          });
-        })
 
         this.PKGData = {
           'bootstrap': {
@@ -111,6 +61,38 @@ let _asyncMauGalleryLauncher = {
 
         this.waitCounter = 0;
         this.DOMContentLoaded = false;
+
+        function injectGalleriesConfigs(me) {
+          window.addEventListener('load', () => {
+            const mauPrefixClass = me.globalMauGalleryConfig['mauPrefixClass'];
+            const galleryElements = document.querySelectorAll(`[data-${mauPrefixClass}-gallery-id]`);
+            me.mauGalleriesConfig = [];
+
+            galleryElements.forEach(currentGalleryInstanceDOMElement => {
+              const galleryRootNodeId = currentGalleryInstanceDOMElement.getAttribute(`data-${mauPrefixClass}-gallery-id`);
+              const currentGalleryConfig = {
+                galleryRootNodeId,
+                lightBox: currentGalleryInstanceDOMElement.getAttribute(`data-${mauPrefixClass}-lightbox`) === "true",
+                navigation: currentGalleryInstanceDOMElement.getAttribute(`data-${mauPrefixClass}-navigation`) === "true",
+                showTags: currentGalleryInstanceDOMElement.getAttribute(`data-${mauPrefixClass}-showtags`) === "true",
+                tagsPosition: currentGalleryInstanceDOMElement.getAttribute(`data-${mauPrefixClass}-tagsposition`),
+                mutableOptions: currentGalleryInstanceDOMElement.getAttribute(`data-${mauPrefixClass}-mutable-options`) === "true",
+                columns: {
+                  xs: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${mauPrefixClass}-columns-xs`)),
+                  sm: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${mauPrefixClass}-columns-sm`)),
+                  md: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${mauPrefixClass}-columns-md`)),
+                  lg: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${mauPrefixClass}-columns-lg`)),
+                  xl: parseInt(currentGalleryInstanceDOMElement.getAttribute(`data-${mauPrefixClass}-columns-xl`)),
+                }
+              };
+              currentGalleryInstanceDOMElement.id = galleryRootNodeId;
+              me.mauGalleriesConfig.push(currentGalleryConfig);
+              me.readyToMountGalleriesComponents = true;
+            });
+          })
+        }
+
+        injectGalleriesConfigs(this);
       }
 
       debugger(msg, maybeError = false) {
@@ -543,7 +525,7 @@ let _asyncMauGalleryLauncher = {
                   const mauPrefixClass = _asyncMauGalleryLauncher.Launcher_Instance.globalMauGalleryConfig['mauPrefixClass'];
                   const galleryPlaceHolderClass = _asyncMauGalleryLauncher.Launcher_Instance.globalMauGalleryConfig['galleryPlaceHolderClass'];
                   const placeholders = document.querySelectorAll(`.${mauPrefixClass}.${galleryPlaceHolderClass}`);
-                  placeholders.forEach(element => element.outerHTML = `<div class="mau gallery-placeholder alert alert-danger" role="alert">${_asyncMauGalleryLauncher.Launcher_Instance["failedToLoadMauGalleryMsg"]}</div>`);
+                  placeholders.forEach(element => element.outerHTML = `<div class="mau gallery-placeholder alert alert-danger" role="alert">${_asyncMauGalleryLauncher.Launcher_Instance['failedToLoadMauGalleryMsg']}</div>`);
                 }
               ]
             },

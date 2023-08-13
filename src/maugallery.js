@@ -1,30 +1,34 @@
-// * ... Default global config
+// * ... Prefix Class
 let _mauGalleryManager = {
   'mauGalleryGlobalConfig': {
-    'anyImageServedByHTTP1Server': true,
-    'mauPrefixClass': 'mau',
-    'lightboxId': 'myAwesomeLightbox',
-    'prevImgButtonLabel': 'Previous image',
-    'nextImgButtonLabel': 'Next image',
-    'disableFiltersButtonLabel': 'All',
-    'modalTriggerClass': 'modal-trigger',
-    'galleryItemClass': 'gallery-item',
-    'modalWrapperClass': 'modal-component',
-    'galleryPlaceHolderClass': 'gallery-placeholder',
-    'styles': {
-      'animation': {
-        'modal': {
-          'arrowTransitionDelay': '.4s'
-        }
-      },
+    'mauPrefixClass': _asyncMauGalleryLauncher.Launcher_Instance.globalMauGalleryConfig['mauPrefixClass']
+  }
+};
+
+// * ... Default global config
+Object.assign(_mauGalleryManager['mauGalleryGlobalConfig'], {
+  'lightboxId': `${_mauGalleryManager['mauPrefixClass']}-lightbox`,
+  'anyImageServedByHTTP1Server': true,
+  'prevImgButtonLabel': 'Previous image',
+  'nextImgButtonLabel': 'Next image',
+  'disableFiltersButtonLabel': 'All',
+  'modalTriggerClass': 'modal-trigger',
+  'galleryItemClass': 'gallery-item',
+  'modalWrapperClass': 'modal-component',
+  'galleryPlaceHolderClass': 'gallery-placeholder',
+  'styles': {
+    'animation': {
       'modal': {
-        'navigation': {
-          'arrowBoxesSizeObj': { size: '50', unit: 'px' }
-        }
+        'arrowTransitionDelay': '.4s'
+      }
+    },
+    'modal': {
+      'navigation': {
+        'arrowBoxesSizeObj': { size: '50', unit: 'px' }
       }
     }
   }
-};
+});
 
 // * ... Utilitary functions
 Object.assign(_mauGalleryManager, {
