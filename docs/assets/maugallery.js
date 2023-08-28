@@ -116,7 +116,6 @@ Object.assign(_mauGalleryManager, {
     class Mobile {
       constructor() {
         this.onMobile = null;
-        this.screenOrientation = null;
       }
 
       isOnMobile(lazy = true) {
@@ -125,25 +124,6 @@ Object.assign(_mauGalleryManager, {
           this.onMobile = userAgent.match(/(ipad)|(iphone)|(ipod)|(android)|(webos)|(blackberry)|(tablet)|(kindle)|(playbook)|(silk)|(windows phone)/i);
         }
         return this.onMobile;
-      }
-
-      getCurrentScreenOrientation() {
-        let screenOrientation = null;
-        if (!this.isOnMobile()) {
-          return null;
-        }
-
-        if (window.innerWidth < window.innerHeight) {
-          screenOrientation = 'p';
-        } else {
-          screenOrientation = 'l';
-        }
-        this.screenOrientation = screenOrientation;
-        return screenOrientation;
-      }
-
-      getSavedScreenOrientation() {
-        return this.screenOrientation;
       }
     }
 });
@@ -780,7 +760,6 @@ Object.assign(_mauGalleryManager, {
           'oldX': 0,
           'oldY': 0,
           'oldYDelta': 0,
-          'screenOrientation': null,
           'lockScreenHasGlitched': false
         };
       }
