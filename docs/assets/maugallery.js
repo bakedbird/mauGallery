@@ -825,7 +825,7 @@ Object.assign(_mauGalleryManager, {
           const beLazy = true;
           const computedTopPx = DOM_Manipulations_Instance.getElementTopPx(activeElement, beLazy);
           const navbarElement = document.querySelector('.navbar');
-          const navbarIsInViewport = DOM_Manipulations_Instance.isInViewport(navbarElement);
+          const navbarIsInViewport = navbarElement ? DOM_Manipulations_Instance.isInViewport(navbarElement) : false;
           const navbarOffset = navbarIsInViewport ? DOM_Manipulations_Instance.getElementHeight(navbarElement) * 1.10 : 0;
           const elementIsUpper = computedBottomPx < navbarOffset;
           const elementIsBelow = computedTopPx >= window.innerHeight;
