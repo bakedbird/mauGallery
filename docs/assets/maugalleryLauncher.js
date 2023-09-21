@@ -266,7 +266,7 @@ let _asyncMauGalleryLauncher = {
               const becuzMsg = 'because ALL the following required features has been found in the `window` object:';
               let requiredFeaturesStr = '';
               if (me.ASYNC_LAUNCHER_DEBUG_MODE_FORMATTED_MSG) {
-                requiredFeaturesStr = `(${requiredFeatures.toString().replace(/,/g, ', ')})`;
+                requiredFeaturesStr = `(${requiredFeatures.join(', ')})`;
               } else {
                 requiredFeaturesStr = `(${requiredFeatures})`;
               }
