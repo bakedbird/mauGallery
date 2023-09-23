@@ -1168,17 +1168,6 @@ Object.assign(_mauGalleryManager, {
   }
 });
 
-// * ... Placeholders handling
-Object.assign(_mauGalleryManager, {
-  removePlaceholders: () => {
-    const mauPrefixClass = _mauGalleryManager.options('mauPrefixClass');
-    const galleryPlaceHolderClass = _mauGalleryManager.options('galleryPlaceHolderClass');
-    const placeholders = document.querySelectorAll(`.${mauPrefixClass}.${galleryPlaceHolderClass}`);
-    placeholders.forEach((element) => element.remove());
-  }
-});
-
-_mauGalleryManager.removePlaceholders();
 _mauGalleryManager.appendGlobalCSS();
 
 if (typeof _asyncMauGalleryLauncher === 'undefined') {
@@ -1206,5 +1195,10 @@ if (typeof _asyncMauGalleryLauncher === 'undefined') {
     _mauGalleryManager.mauGalleriesConfig.push(currentGalleryConfig);
   });
 
-  _mauGalleryManager.mauGalleriesConfig.forEach((conf) => new _mauGalleryManager.MauGallery(conf));
+  _mauGalleryManager.mauGalleriesConfig.forEach((conf) => {
+    new _mauGalleryManager.MauGallery(conf);
+    const galleryPlaceHolderClass = _mauGalleryManager.options('galleryPlaceHolderClass');
+    const placeholder = document.querySelector(`#${conf.galleryRootNodeId} .${galleryPlaceHolderClass}`);
+    if (placeholder) placeholder.remove();
+  });
 }

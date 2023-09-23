@@ -38,7 +38,12 @@ let _asyncMauGalleryLauncher = {
           const coroutine = setInterval(() => {
             if (launcherPtr.Launcher_Instance['readyToMountGalleriesComponents']) {
               clearInterval(coroutine);
-              launcherPtr.Launcher_Instance['mauGalleriesConfig'].forEach((conf) => new _mauGalleryManager.MauGallery(conf));
+              launcherPtr.Launcher_Instance['mauGalleriesConfig'].forEach((conf) => {
+                new _mauGalleryManager.MauGallery(conf);
+                const galleryPlaceHolderClass = _mauGalleryManager.options('galleryPlaceHolderClass');
+                const placeholder = document.querySelector(`#${conf.galleryRootNodeId} .${galleryPlaceHolderClass}`);
+                if (placeholder) placeholder.remove();
+              });
             }
           }, 1);
         }
