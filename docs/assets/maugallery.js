@@ -62,14 +62,6 @@ Object.assign(_mauGalleryManager, {
   },
 
   objAccessor: (obj, key, value = undefined) => {
-    if (typeof key !== 'string') {
-      throw new Error("'key' must be a string");
-    }
-
-    if (!(key in obj)) {
-      throw new Error(`No value found for key: ${key}`);
-    }
-
     if (value === undefined) {
       return _mauGalleryManager.objReader(obj, key);
     } else {
